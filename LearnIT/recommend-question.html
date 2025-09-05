@@ -5,8 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recommend-Question</title>
   <link rel="stylesheet" href="style.css">
+  
+  <style>
+   form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+	
+
+    fieldset {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    legend {
+	  font-size: 2em;
+	  text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+      padding: 0 10px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+
+    select, textarea, input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+	
+  </style>
+  
 </head>
 <body>
+
   <header>
     <div class="logo">
       <img src="images/logo.png" alt="LearnIT Logo">
@@ -18,9 +66,65 @@
       <a href="signup.html">Sign Up</a>
     </nav>
   </header>
+  
   <main>
-    <h2>Recommend-Question</h2>
-    <p>Recommend a question for an educator's quiz.</p>
+  
+	<form>
+	
+	<legend>Recommend a Question</legend>
+	
+	<fieldset>
+	
+	<label for="rating">Choose a Professor:</label>
+        <select id="rating" name="rating" required>
+          <option value="" disabled selected>Select educator</option>
+          <option value="Sarah">Sarah</option>
+          <option value="Hussah">Hussah</option>
+          <option value="Khaled">Khaled</option>
+          <option value="Aryam">Aryam</option>
+        </select>
+		
+	<label for="rating">Select a quiz:</label>
+        <select id="rating" name="rating" required>
+          <option value="" disabled selected>Select quiz</option>
+          <option value="Advansed Physics">Advansed Physics</option>
+          <option value="Python101">Python101</option>
+          <option value="Introduction to IT">Introduction to IT</option>
+        </select>
+	
+	<label>Write your Question here:</label>
+        <textarea placeholder="Type your quistion here.."></textarea>
+		
+	<label>Upload figuer if needed</label>
+        <input type="file">
+		
+	<label>Answer A</label>
+        <input type="text">
+		
+	<label>Answer B</label>
+        <input type="text">
+	
+	<label>Answer C</label>
+        <input type="text">
+		
+	<label>Answer D</label>
+        <input type="text">
+		
+	<label for="rating">Select The right answer:</label>
+        <select id="rating" name="rating" required>
+          <option value="" disabled selected>Select right answer</option>
+          <option value="correct">A</option>
+          <option value="correct">B</option>
+          <option value="correct">C</option>
+		  <option value="correct">D</option>
+        </select>
+		
+	</fieldset>
+	
+	<button type="submit" class="btn">Submit Feedback</button>
+	
+	</form>
+	
   </main>
   <footer>
     <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
