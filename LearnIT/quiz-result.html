@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Results | LearnIT</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+   
+
+    main {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+	  
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .score-display {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    #vid {
+      display: block;
+      margin: 0 auto 30px auto;
+      width: 60%;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+    }
+
+    form.flex-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    fieldset {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    legend {
+      font-weight: bold;
+      padding: 0 10px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+
+    select, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+	a{
+	padding: 10px 20px;
+      color: gray;
+      text-decoration: none;
+      border: none;
+      border-radius: 5px;
+      text-align: center;
+	}
+	
+	a:hover{
+	  color: darkgray;
+	}
+
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">
+      <img src="images/logo.png" alt="LearnIT Logo">
+      <h1>LearnIT</h1>
+    </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="login.html">Login</a>
+      <a href="signup.html">Sign Up</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Quiz Results</h2>
+    
+    <div class="score-display">
+      Congratulations! You got <strong>100%</strong>!
+    </div>
+
+    <video id="vid" src="images/cheer.mp4" autoplay muted loop>
+      Sorry, your browser doesn't support embedded videos.
+    </video>
+
+    <form class="flex-container" onsubmit="handleSubmit(event)">
+      <fieldset>
+        <legend>Rate the Quiz!</legend>
+
+        <label for="rating">How was the quiz?</label>
+        <select id="rating" name="rating" required>
+          <option value="" disabled selected>Select rating</option>
+          <option value="1">Poor</option>
+          <option value="2">Bad</option>
+          <option value="3">Average</option>
+          <option value="4">Good</option>
+          <option value="5">Excellent</option>
+        </select>
+
+        <label for="comments">Would you like to leave a comment?</label>
+        <textarea id="comments" name="comments" placeholder="Please share your thoughts!"></textarea>
+      </fieldset>
+
+      
+        <button type="submit" class="btn">Submit Feedback</button>
+        <a href="index.html">Return Home</a>
+      
+    </form>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
+  </footer>
+
+</body>
+</html>

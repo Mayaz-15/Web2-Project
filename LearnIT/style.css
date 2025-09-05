@@ -1,0 +1,74 @@
+/* style.css (Relaxed Tech Theme) */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #eef5f9, #d9f0f3);
+  color: #2e3a45;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.6;
+}
+
+/* Header */
+header {
+  background: #1f3b4d;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  border-bottom: 3px solid #d9f0f3;
+  color: #fff;
+}
+
+header .logo { display: flex; align-items: center; }
+header .logo img { height: 45px; margin-right: 10px; }
+header .logo h1 { font-size: 22px; letter-spacing: 1px; }
+
+header nav a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #eaf6fb;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+header nav a:hover { color: #aed6f1; }
+
+/* Main content */
+main {
+  flex: 1;
+  padding: 40px;
+}
+
+h2 {
+  color: #1f3b4d;
+  margin-bottom: 20px;
+}
+
+/* Footer */
+footer {
+  background: #1f3b4d;
+  text-align: center;
+  padding: 15px;
+  border-top: 3px solid #d9f0f3;
+  font-size: 14px;
+  color: #d6eaf8;
+}
+
+/* Buttons */
+button, .btn {
+  background: #5dade2;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+button:hover, .btn:hover {
+  background: #3498db;
+  transform: scale(1.05);
+}
