@@ -112,12 +112,12 @@
       Sorry, your browser doesn't support embedded videos.
     </video>
 
-    <form class="flex-container" onsubmit="handleSubmit(event)">
+    <form class="flex-container">
       <fieldset>
         <legend>Rate the Quiz!</legend>
 
         <label for="rating">How was the quiz?</label>
-        <select id="rating" name="rating" required>
+        <select id="rating" name="rating">
           <option value="" disabled selected>Select rating</option>
           <option value="1">Poor</option>
           <option value="2">Bad</option>
@@ -131,8 +131,8 @@
       </fieldset>
 
       
-        <button type="submit" class="btn">Submit Feedback</button>
-        <a id="home" href="index.html">Return Home</a>
+        <button type="button" class="btn" onClick="re()">Submit Feedback</button>
+        <a id="home" href="learner.html">Return Home</a>
       
     </form>
   </main>
@@ -141,5 +141,13 @@
     <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
   </footer>
 
+  <script>
+  function re(){
+  window.location.replace("learner.html");
+  
+  }
+  
+  </script>
+  
 </body>
 </html>
