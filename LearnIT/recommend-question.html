@@ -75,48 +75,50 @@
 	
 	<fieldset>
 	
-	<label for="rating">Choose a Professor:</label>
-        <select id="rating" name="rating" required>
-          <option value="" disabled selected>Select educator</option>
-          <option value="Sarah">Sarah</option>
-          <option value="Hussah">Hussah</option>
-          <option value="Khaled">Khaled</option>
-          <option value="Aryam">Aryam</option>
+		
+	<label>Select a Topic:</label>
+        <select id="topic" name="topic" required>
+          <option value="" disabled selected>Select topic</option>
+          <option value="ai">AI (Artificial intelligence)</option>
+          <option value="iot">IOT (Internet of things)</option>
+		  <option value="cyber">Cybersecurity</option>
         </select>
 		
-	<label for="rating">Select a quiz:</label>
-        <select id="rating" name="rating" required>
-          <option value="" disabled selected>Select quiz</option>
-          <option value="Advansed Physics">The Network Layer</option>
-          <option value="Python101">Python101</option>
-          <option value="Introduction to IT">Cybersecurity Concepts</option>
+		
+	<label>Choose a Professor:</label>
+        <select id="prof" name="prof" required>
+          <option value="" disabled selected>Select professor</option>
+          <option value="sarah">Sarah</option>
+          <option value="hussah">Hussah</option>
+          <option value="khaled">Khaled</option>
+          <option value="aryam">Aryam</option>
         </select>
 	
 	<label>Write your Question here:</label>
-        <textarea placeholder="Type your quistion here.."></textarea>
+        <textarea placeholder="Type your quistion here.." name="Q" required></textarea>
 		
-	<label>Upload figuer if needed</label>
-        <input type="file">
+	<label>Upload figuer (if needed)</label>
+        <input type="file" name="pic">
 		
 	<label>Answer A</label>
-        <input type="text">
+        <input type="text" name="a" required>
 		
 	<label>Answer B</label>
-        <input type="text">
+        <input type="text" name="b" required>
 	
 	<label>Answer C</label>
-        <input type="text">
+        <input type="text" name="c" required>
 		
 	<label>Answer D</label>
-        <input type="text">
+        <input type="text" name="d" required>
 		
-	<label for="rating">Select The right answer:</label>
-        <select id="rating" name="rating" required>
+	<label>Select The right answer:</label>
+        <select id="rightAns" name="rightAns" required>
           <option value="" disabled selected>Select right answer</option>
-          <option value="correct">A</option>
-          <option value="correct">B</option>
-          <option value="correct">C</option>
-		  <option value="correct">D</option>
+          <option value="a">A</option>
+          <option value="b">B</option>
+          <option value="c">C</option>
+		  <option value="d">D</option>
         </select>
 		
 	</fieldset>
@@ -126,8 +128,10 @@
 	</form>
 	
   </main>
+  
   <footer>
     <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
   </footer>
+  
 </body>
 </html>
