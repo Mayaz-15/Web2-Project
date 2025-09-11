@@ -10,45 +10,48 @@
    form {
       display: flex;
       flex-direction: column;
-      gap: 15px;
-      margin: 30px auto;
-      padding: 20px;
+      gap: 0.938em;
+      margin: 1.875em auto;
+      padding: 1.25em;
       background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 0.5em;
+      box-shadow: 0 0.125em 0.312em rgba(0,0,0,0.1);
     }
 	
 
     fieldset {
-      border: 1px solid #ddd;
-      padding: 20px;
-      border-radius: 8px;
+      border: 0.062em solid #ddd;
+      padding: 1.25em;
+      border-radius: 0.5em;
     }
 
     legend {
 	  font-size: 2em;
 	  text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 1.25em;
       font-weight: bold;
-      padding: 0 10px;
+      padding: 0 0.625em;
     }
 
     label {
       display: block;
-      margin: 10px 0 5px;
+      margin: 0.625em 0 0.312em;
     }
 
     select, textarea, input {
       width: 100%;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      padding: 0.625em;
+      border-radius: 0.312em;
+      border: 0.062em solid #ccc;
     }
 
     textarea {
-      min-height: 80px;
+      min-height: 5.0em;
       resize: vertical;
     }
+	
+	
+	
 	
   </style>
   
@@ -68,6 +71,7 @@
   </header>
   
   <main>
+  <div class="card-container">
   
 	<form>
 	
@@ -123,11 +127,12 @@
 		
 	</fieldset>
 	
-	<button type="submit" class="btn" onClick="re()">Submit Feedback</button>
+	<button type="submit" class="submit" onClick="re()">Submit Quistion</button>
 	
 	</form>
 	
-  </main>
+    </div>
+</main>
   
   <footer>
     <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
