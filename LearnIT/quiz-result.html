@@ -9,74 +9,64 @@
   <style>
    
 
-    main {
-      max-width: 800px;
-      margin: 30px auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-	  
-    }
-
     h2 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 1.25em;
     }
 
     .score-display {
       text-align: center;
       font-size: 1.5rem;
-      margin-bottom: 20px;
+      margin-bottom: 1.25em;
     }
 
     #vid {
       display: block;
-      margin: 0 auto 30px auto;
+      margin: 0 auto 1.875em auto;
       width: 60%;
-      border: 2px solid #ccc;
-      border-radius: 10px;
+      border: 0.125em solid #ccc;
+      border-radius: 0.625em;
     }
 
     form.flex-container {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 0.938em;
     }
 
     fieldset {
-      border: 1px solid #ddd;
-      padding: 20px;
-      border-radius: 8px;
+      border: 0.062em solid #ddd;
+      padding: 1.25em;
+      border-radius: 0.5em;
     }
 
     legend {
       font-weight: bold;
-      padding: 0 10px;
+      padding: 0 0.625em;
     }
 
     label {
       display: block;
-      margin: 10px 0 5px;
+      margin: 0.625em 0 0.312em;
     }
 
     select, textarea {
       width: 100%;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      padding: 0.625em;
+      border-radius: 0.312em;
+      border: 0.062em solid #ccc;
     }
 
     textarea {
-      min-height: 80px;
+      min-height: 5.0em;
       resize: vertical;
     }
 	#home{
-	padding: 10px 20px;
+	padding: 0.625em 1.25em;
       color: gray;
       text-decoration: none;
       border: none;
-      border-radius: 5px;
+      border-radius: 0.312em;
       text-align: center;
 	}
 	
@@ -101,7 +91,7 @@
     </nav>
   </header>
 
-  <main>
+  <div class="card-container">
     <h2>Quiz Results</h2>
     
     <div class="score-display">
@@ -131,11 +121,12 @@
       </fieldset>
 
       
-        <button type="button" class="btn" onClick="re()">Submit Feedback</button>
+        <button type="button" class="submit" onClick="re()">Submit Feedback</button>
         <a id="home" href="learner.html">Return Home</a>
       
     </form>
-  </main>
+    </div>
+
 
   <footer>
     <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
