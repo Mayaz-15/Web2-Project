@@ -63,8 +63,22 @@ button, .btn {
   transition: background 0.3s, transform 0.2s;
 }
 
+.submit {
+    background: #38B2AC;
+    
+}
+
+.edit {
+    background: #808080;
+    
+}
+
+.delete {
+    background: #B53737;
+    
+}
+
 button:hover, .btn:hover {
-  background: #3498db;
   transform: scale(1.05);
 }
 
