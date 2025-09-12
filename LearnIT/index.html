@@ -29,13 +29,7 @@ font-size:3.125rem ;
 
 
 
-.welcome-card {
-  background: #fff;         
-  padding: 1.25rem;
-  border-radius: 0.625rem;      
-  box-shadow: 0 0.25rem 0.625rem rgba(0,0,0,0.1); 
-  max-width: 70rem; 
-  margin: 1.25rem auto;      
+.welcome-card .card-container{
   text-align: center;
 }
 
@@ -83,14 +77,8 @@ font-size:3.125rem ;
       font-size: 1.125rem;
     }
 
-.cardhome1 {   
-  background: white;
-  padding: 1.875rem;   
-  margin: 1.25rem auto;
+.cardhome1 .card-container {   
   width: 100%;      
-  max-width: 70rem; 
-  border-radius: 0.625rem;
-  box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
@@ -130,13 +118,18 @@ font-size:3.125rem ;
 
 
 
-.quizzes-card {
+.quizzes-card{
   display: flex;
   justify-content: center;   
   gap: 1.5rem;               
   flex-wrap: wrap;           
   max-width: 70rem;         
-  margin: 2rem auto;         
+  margin: 2rem auto;
+  background:#fff;
+  margin: 2em auto;
+  padding: 1.5em;
+  border-radius: 0.5em;
+  box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1);
 }
 
 .quizhome {
@@ -172,7 +165,7 @@ font-size:3.125rem ;
 
 	
 	
-	
+
 	
 	
 
@@ -200,7 +193,7 @@ font-size:3.125rem ;
 <section class="home-container">
     <h2>Welcome to LearnIT</h2>
 	
-<div class=" welcome-card ">
+<div class=" welcome-card card-container ">
   <img src="images/welcome  .JPG" alt="Welcome Image" class="home-img">
 <p>
   LearnIT is a platform designed to guide learners and educators through 
@@ -214,7 +207,7 @@ font-size:3.125rem ;
 
 <hr>
 
-<div class=" cardhome1">
+<div class=" cardhome1 card-container">
   <a href="login.html" class="btn-login">Log in</a>
   <p class="signup-text1">New User? <a href="signup.html">Sign Up</a></p>
 </div>
@@ -263,4 +256,3 @@ font-size:3.125rem ;
   </footer>
 </body>
 </html>
-
