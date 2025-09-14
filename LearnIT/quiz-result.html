@@ -14,7 +14,7 @@
       margin-bottom: 1.25em;
     }
 
-    .score-display {
+    #result {
       text-align: center;
       font-size: 1.5rem;
       margin-bottom: 1.25em;
@@ -28,7 +28,7 @@
       border-radius: 0.625em;
     }
 
-    form.flex-container {
+    form{
       display: flex;
       flex-direction: column;
       gap: 0.938em;
@@ -61,18 +61,7 @@
       min-height: 5.0em;
       resize: vertical;
     }
-	#home{
-	padding: 0.625em 1.25em;
-      color: gray;
-      text-decoration: none;
-      border: none;
-      border-radius: 0.312em;
-      text-align: center;
-	}
-	
-	#home:hover{
-	  color: darkgray;
-	}
+
 
   </style>
 </head>
@@ -86,15 +75,13 @@
     </div>
     <nav>
       <a href="index.html">Home</a>
-      <a href="login.html">Login</a>
-      <a href="signup.html">Sign Up</a>
     </nav>
   </header>
 
   <div class="card-container">
     <h2>Quiz Results</h2>
     
-    <div class="score-display">
+    <div id="result">
       Congratulations! You got <strong>100%</strong>!
     </div>
 
@@ -102,7 +89,7 @@
       Sorry, your browser doesn't support embedded videos.
     </video>
 
-    <form class="flex-container">
+    <form>
       <fieldset>
         <legend>Rate the Quiz!</legend>
 
@@ -122,7 +109,7 @@
 
       
         <button type="button" class="submit" onClick="re()">Submit Feedback</button>
-        <a id="home" href="learner.html">Return Home</a>
+        <a id="takeHome" href="learner.html">Return Home</a>
       
     </form>
     </div>
