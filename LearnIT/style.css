@@ -83,7 +83,7 @@ button:hover, .btn:hover {
   transform: scale(1.05);
 }
 
-#takeHome{
+.takeHome{
 	padding: 0.625em 1.25em;
       color: gray;
       text-decoration: none;
@@ -92,7 +92,7 @@ button:hover, .btn:hover {
       text-align: center;
 }
 	
-#takeHome:hover{
+.takeHome:hover{
 	  color: darkgray;
 }
 
