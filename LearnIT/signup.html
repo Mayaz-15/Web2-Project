@@ -36,12 +36,12 @@
       font-weight: 500;
       transition: color 0.3s;
     }
-    header nav a:hover { color: #aed6f1; }
+   
 
     main {
       flex: 1;
       padding: 40px;
-      max-width: 800px; /* توسيع الحاوية الرئيسية */
+      max-width: 800px;
       margin: auto;
     }
 
@@ -85,22 +85,30 @@
       font-size: 15px;
     }
 
-    button, .btn {
-      background: #5dade2;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-      margin-top: 15px;
-      font-size: 15px;
-    }
-    button:hover, .btn:hover {
-      background: #3498db;
+  button, .btn {
+  background: #5dade2;
+  border: none;
+  padding: 0.625em 1.25em;
+  border-radius: 0.375em;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  text-decoration: none;
+}
+    button:hover {
       transform: scale(1.05);
     }
+
+    .btn-learners {
+      background: #0A3D62;
+      margin-right: 10px;
+    }
+   
+    .btn-educators {
+      background: #38B2AC;
+    }
+    
 
     footer {
       background: #1f3b4d;
@@ -120,15 +128,31 @@
 
     .hidden { display: none; }
 
-    /* توحيد مقاسات الفورم */
     .form-box fieldset {
       width: 100%;
-      max-width: 750px; /* توسيع عرض الفورم */
+      max-width: 750px;
       min-height: 520px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      margin: auto; /* إبقاء الفورم في المنتصف */
+      margin: auto;
+    }
+
+    .card-container {
+      height: 70rem;
+      width: 70rem;
+      margin: 2em auto;
+      padding: 1.5em;
+      background-color: #ffffff;
+      border-radius: 0.5em;
+      box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1);
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -147,7 +171,7 @@
   </header>
 
   <!-- Main -->
-  <main>
+  <main class="card-container">
     <h2>Create Your Account</h2>
 
     <!-- User Type -->
@@ -163,8 +187,8 @@
       </div>
     </fieldset>
 
-    <!-- Learner Form (visible by default) -->
-    <form id="learnerForm" class="form-box" onsubmit="return handleSubmit(event,'learner')">
+    <!-- Learner Form -->
+    <form id="learnerForm" class="form-box" onsubmit="return false;">
       <fieldset>
         <legend>Learner Form</legend>
         <label>First Name:</label>
@@ -172,17 +196,22 @@
         <label>Last Name:</label>
         <input type="text" placeholder=" Al-Qahtani" required />
         <label>Profile Image:</label>
-        <input type="file" id="learnerImage" accept="image/*"/>
+        <input type="file" id="learnerImage" accept="image/*" />
+        <small>No file chosen</small>
         <label>Email:</label>
         <input type="email" placeholder=" learner@example.com" required />
         <label>Password:</label>
         <input type="password" placeholder=" StrongPass123" required />
-        <button type="submit">Create Learner Account</button>
+
+        <div class="btn-group">
+          <button type="button" class=".btn btn-learners" onclick="goHome('learner')">Sign Up Learner’s Homepage</button>
+          <button type="button" class=".btn btn-educators" onclick="goHome('educator')">Sign Up Educator’s Homepage</button>
+        </div>
       </fieldset>
     </form>
 
-    <!-- Educator Form (hidden by default) -->
-    <form id="educatorForm" class="hidden form-box" onsubmit="return handleSubmit(event,'educator')">
+    <!-- Educator Form -->
+    <form id="educatorForm" class="hidden form-box" onsubmit="return false;">
       <fieldset>
         <legend>Educator Form</legend>
         <label>First Name:</label>
@@ -190,7 +219,8 @@
         <label>Last Name:</label>
         <input type="text" placeholder=" Al-Otaibi" required />
         <label>Profile Image:</label>
-        <input type="file" id="educatorImage" accept="image/*"/>
+        <input type="file" id="educatorImage" accept="image/*" />
+        <small>No file chosen</small>
         <label>Email:</label>
         <input type="email" placeholder=" educator@example.com" required />
         <label>Password:</label>
@@ -198,10 +228,14 @@
         <label>Specialized Topics:</label>
         <div>
           <input type="checkbox" name="topics" value="AI"> AI<br>
-          <input type="checkbox" name="topics" value="IOT"> IOT<br>
-          <input type="checkbox" name="topics" value="Security"> Security<br>
+          <input type="checkbox" name="topics" value="IoT"> IoT<br>
+          <input type="checkbox" name="topics" value="Cybersecurity"> Cybersecurity<br>
         </div>
-        <button type="submit">Create Educator Account</button>
+
+        <div class="btn-group">
+          <button type="button" class=".btn btn-learners" onclick="goHome('learner')">Sign Up Learner’s Homepage</button>
+          <button type="button" class=".btn btn-educators" onclick="goHome('educator')">Sign Up Educator’s Homepage</button>
+        </div>
       </fieldset>
     </form>
   </main>
@@ -216,7 +250,6 @@
     const learnerForm = document.getElementById('learnerForm');
     const educatorForm = document.getElementById('educatorForm');
 
-    // تحديث عند تغيير الراديو
     radios.forEach(radio => {
       radio.addEventListener('change', function() {
         if (this.value === "learner") {
@@ -229,17 +262,12 @@
       });
     });
 
-    // وظيفة إرسال النموذج
-    function handleSubmit(event, type) {
-      event.preventDefault();
-      let imgInput = type === "learner" ? document.getElementById('learnerImage') : document.getElementById('educatorImage');
-      if (!imgInput.files.length) {
-        alert("No image uploaded → Default profile will be used.");
-        window.location.href = type + "_home.html?img=account-icon-black.png";
-      } else {
-        window.location.href = type + "_home.html";
+    function goHome(type) {
+      if (type === "learner") {
+        window.location.href = "learner_home.html";
+      } else if (type === "educator") {
+        window.location.href = "educator_home.html";
       }
-      return false;
     }
   </script>
 </body>
