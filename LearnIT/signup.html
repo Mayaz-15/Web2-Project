@@ -36,7 +36,6 @@
       font-weight: 500;
       transition: color 0.3s;
     }
-   
 
     main {
       flex: 1;
@@ -85,18 +84,20 @@
       font-size: 15px;
     }
 
-  button, .btn {
-  background: #5dade2;
-  border: none;
-  padding: 0.625em 1.25em;
-  border-radius: 0.375em;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  text-decoration: none;
-}
-    button:hover {
+    a.btn {
+      display: inline-block;
+      text-align: center;
+      border: none;
+      padding: 0.625em 1.25em;
+      border-radius: 0.375em;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      text-decoration: none;
+      font-size: 15px;
+    }
+    a.btn:hover {
       transform: scale(1.05);
     }
 
@@ -104,11 +105,9 @@
       background: #0A3D62;
       margin-right: 10px;
     }
-   
     .btn-educators {
       background: #38B2AC;
     }
-    
 
     footer {
       background: #1f3b4d;
@@ -188,7 +187,7 @@
     </fieldset>
 
     <!-- Learner Form -->
-    <form id="learnerForm" class="form-box" onsubmit="return false;">
+    <form id="learnerForm" class="form-box">
       <fieldset>
         <legend>Learner Form</legend>
         <label>First Name:</label>
@@ -197,21 +196,20 @@
         <input type="text" placeholder=" Al-Qahtani" required />
         <label>Profile Image:</label>
         <input type="file" id="learnerImage" accept="image/*" />
-        <small>No file chosen</small>
         <label>Email:</label>
         <input type="email" placeholder=" learner@example.com" required />
         <label>Password:</label>
         <input type="password" placeholder=" StrongPass123" required />
 
         <div class="btn-group">
-          <button type="button" class=".btn btn-learners" onclick="goHome('learner')">Sign Up Learner’s Homepage</button>
-          <button type="button" class=".btn btn-educators" onclick="goHome('educator')">Sign Up Educator’s Homepage</button>
+          <a href="learner_home.html" class="btn btn-learners">Sign Up Learner’s Homepage</a>
+          <a href="educator_home.html" class="btn btn-educators">Sign Up Educator’s Homepage</a>
         </div>
       </fieldset>
     </form>
 
     <!-- Educator Form -->
-    <form id="educatorForm" class="hidden form-box" onsubmit="return false;">
+    <form id="educatorForm" class="hidden form-box">
       <fieldset>
         <legend>Educator Form</legend>
         <label>First Name:</label>
@@ -220,7 +218,6 @@
         <input type="text" placeholder=" Al-Otaibi" required />
         <label>Profile Image:</label>
         <input type="file" id="educatorImage" accept="image/*" />
-        <small>No file chosen</small>
         <label>Email:</label>
         <input type="email" placeholder=" educator@example.com" required />
         <label>Password:</label>
@@ -233,8 +230,8 @@
         </div>
 
         <div class="btn-group">
-          <button type="button" class=".btn btn-learners" onclick="goHome('learner')">Sign Up Learner’s Homepage</button>
-          <button type="button" class=".btn btn-educators" onclick="goHome('educator')">Sign Up Educator’s Homepage</button>
+          <a href="learner_home.html" class="btn btn-learners">Sign Up Learner’s Homepage</a>
+          <a href="educator_home.html" class="btn btn-educators">Sign Up Educator’s Homepage</a>
         </div>
       </fieldset>
     </form>
@@ -244,31 +241,5 @@
   <footer>
     &copy; 2025 learnIT. All rights reserved.
   </footer>
-
-  <script>
-    const radios = document.querySelectorAll('input[name="userType"]');
-    const learnerForm = document.getElementById('learnerForm');
-    const educatorForm = document.getElementById('educatorForm');
-
-    radios.forEach(radio => {
-      radio.addEventListener('change', function() {
-        if (this.value === "learner") {
-          learnerForm.classList.remove('hidden');
-          educatorForm.classList.add('hidden');
-        } else if (this.value === "educator") {
-          educatorForm.classList.remove('hidden');
-          learnerForm.classList.add('hidden');
-        }
-      });
-    });
-
-    function goHome(type) {
-      if (type === "learner") {
-        window.location.href = "learner_home.html";
-      } else if (type === "educator") {
-        window.location.href = "educator_home.html";
-      }
-    }
-  </script>
 </body>
 </html>
