@@ -8,7 +8,7 @@
   
   <style>
    
-.comments-section {
+.comments-section  {
       width:70rem;
       max-width:100%;
       margin: 3.125rem auto 3.75rem auto;
@@ -69,30 +69,34 @@
 
 
 
-.comments-section::-webkit-scrollbar {
+ .comments-section::-webkit-scrollbar {
   width: 8px;
 }
 
-.comments-section::-webkit-scrollbar-track {
+ .comments-section::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 0.625rem;
 }
 
-.comments-section::-webkit-scrollbar-thumb {
+ .comments-section::-webkit-scrollbar-thumb {
   background: #003366; 
   border-radius: 0.625rem;
 }
 
-.comments-section::-webkit-scrollbar-thumb:hover {
+ .comments-section::-webkit-scrollbar-thumb:hover {
   background: #4fc3f7; 
 }
 
 
-.comments-section {
+.comments-section  {
   scrollbar-width: thin;
   scrollbar-color: #003366 #f1f1f1;
 }
 
+.commentback {
+text-align: right;
+margin-bottom:15px;
+}
 
 	 	 
  
@@ -112,8 +116,7 @@
     </div>
     <nav>
       <a href="index.html">Home</a>
-      <a href="login.html">Login</a>
-      <a href="signup.html">Sign Up</a>
+      
     </nav>
   </header>
   
@@ -121,6 +124,10 @@
 
 <section class="comments-section">
     <h2>Quiz Comments</h2>
+
+ <div class="commentback">
+<a class="takeHome" href="learner.html">Back to Learner Home</a>
+</div>
 
     <div class="comment">
       <div class="author">💬 Anonymous</div>
