@@ -1,27 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Take-Quiz</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Take Quiz</title>
+  <link rel="stylesheet" href="style.css"/>
+
+  <!-- Scoped UI to match add/edit/quiz pages -->
+  <style>
+    .quiz-scope{
+      --qz-gap-1: 0.5rem;
+      --qz-gap-2: 1rem;
+      --qz-gap-3: 1.5rem;
+      --qz-gap-4: 2rem;
+      --qz-radius: 0.8rem;
+      --qz-input-h: 2.75rem;
+
+      --qz-text: inherit;
+      --qz-muted: color-mix(in oklab, currentColor 55%, transparent);
+      --qz-accent: currentColor;
+      --qz-panel-bg: var(--surface-1, #ffffff);
+      --qz-panel-bd: color-mix(in oklab, currentColor 85%, transparent);
+      --qz-input-bg: var(--surface-2, #ffffff);
+      --qz-input-bd: color-mix(in oklab, currentColor 80%, transparent);
+      --qz-ok-bd: color-mix(in oklab, #22c55e 40%, transparent);
+      --qz-ok-bg: color-mix(in oklab, #22c55e 12%, transparent);
+    }
+
+    /* Panel + headings */
+	
+    .quiz-scope h2 {
+      text-align: center;
+	  font-size:2.5rem;
+    }
+    .quiz-scope .q-muted{ color: var(--qz-muted); font-size: 0.95rem; }
+
+	
+    .q-inline{ display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; }
+
+    /* Question card */
+    .q-card{
+      border: 0.08rem solid var(--qz-input-bd);
+      border-radius: var(--qz-radius);
+      padding: var(--qz-gap-2);
+      margin: var(--qz-gap-2) 0;
+      background: var(--qz-panel-bg);
+    }
+    .q-head{ display:flex; justify-content:space-between; align-items:center; gap:var(--qz-gap-2); margin-bottom:0.5rem; }
+    .q-figure{ margin: 0.5rem 0; }
+    .q-figure img{ max-width:100%; height:auto; border-radius: 0.5rem; border: 0.08rem solid var(--qz-input-bd); }
+
+    /* Answers list (radios) */
+    .q-answers{ display:grid; gap:0.5rem; margin-top:0.5rem; }
+    .q-option{
+      display:flex; align-items:center; gap:0.6rem;
+      border: 0.08rem solid var(--qz-input-bd);
+      border-radius: 0.6rem;
+      padding: 0.6rem 0.8rem;
+    }
+    .q-option input[type="radio"]{ transform: scale(1.05); }
+
+    /* Form footer */
+    .q-actions{ display:flex; gap:0.75rem; align-items:center; margin-top: var(--qz-gap-3); }
+  </style>
 </head>
 <body>
   <header>
     <div class="logo">
-      <img src="images/logo.png" alt="LearnIT Logo">
-      <h1>LearnIT</h1>
+      <img src="images/logo.png" alt="LearnIT Logo"/>
+      <h1>LEARNIT</h1>
     </div>
     <nav>
       <a href="index.html">Home</a>
-      <a href="login.html">Login</a>
-      <a href="signup.html">Sign Up</a>
     </nav>
   </header>
-  <main>
-    <h2>Take-Quiz</h2>
-    <p>Take a quiz with 5 random questions.</p>
-  </main>
+
+  <main class="quiz-scope">
+    <div class="card-container">
+      <section class="q-panel">
+        <h2>Take Quiz</h2>
+
+        <!-- Quiz meta (Phase 1 sample data) -->
+        <div class="q-inline" style="justify-content:space-between;">
+          <div>
+            <strong>Topic:</strong> AI – Python101
+            <span class="q-muted">•</span>
+            <strong>Educator:</strong> Dr. Sara Al-Ali
+          </div>
+          <div class="q-inline">
+            <a class="takeHome" href="learner.html">Back to Learner Home</a>
+          </div>
+        </div>
+
+        <p class="q-muted" style="margin-top:0.5rem;">Answer all questions. One correct answer per question.</p>
+
+        <!-- Form submits to score/feedback page (Phase 1 front-end only) -->
+        <form action="quiz-result.html" method="post">
+
+          <!-- Q1 -->
+          <article class="q-card">
+            <div class="q-head">
+              <div><strong>Q1.</strong> What is the correct way to print <code>Hello World</code> in Python?</div>
+            </div>
+            <div class="q-answers">
+              <label class="q-option"><input type="radio" name="q1" value="A" required> A) echo("Hello World")</label>
+              <label class="q-option"><input type="radio" name="q1" value="B"> B) print("Hello World")</label>
+              <label class="q-option"><input type="radio" name="q1" value="C"> C) printf("Hello World")</label>
+              <label class="q-option"><input type="radio" name="q1" value="D"> D) console.log("Hello World")</label>
+            </div>
+          </article>
+
+          <!-- Q2 -->
+          <article class="q-card">
+            <div class="q-head">
+              <div><strong>Q2.</strong> Which of the following is a valid Python variable name?</div>
+            </div>
+            <div class="q-answers">
+              <label class="q-option"><input type="radio" name="q2" value="A" required> A) 2value</label>
+              <label class="q-option"><input type="radio" name="q2" value="B"> B) value-2</label>
+              <label class="q-option"><input type="radio" name="q2" value="C"> C) value_2</label>
+              <label class="q-option"><input type="radio" name="q2" value="D"> D) value 2</label>
+            </div>
+          </article>
+
+          <!-- Q3 (with figure example) -->
+          <article class="q-card">
+            <div class="q-head">
+              <div><strong>Q3.</strong> What is the output of the following code?</div>
+            </div>
+            <pre class="q-figure"><code>x = 5
+y = 2
+print(x // y)</code></pre>
+            <div class="q-answers">
+              <label class="q-option"><input type="radio" name="q3" value="A" required> A) 2.5</label>
+              <label class="q-option"><input type="radio" name="q3" value="B"> B) 2</label>
+              <label class="q-option"><input type="radio" name="q3" value="C"> C) 3</label>
+              <label class="q-option"><input type="radio" name="q3" value="D"> D) Error</label>
+            </div>
+          </article>
+
+          <!-- Q4 -->
+          <article class="q-card">
+            <div class="q-head">
+              <div><strong>Q4.</strong> Which type is returned by <code>input()</code> by default in Python 3?</div>
+            </div>
+            <div class="q-answers">
+              <label class="q-option"><input type="radio" name="q4" value="A" required> A) int</label>
+              <label class="q-option"><input type="radio" name="q4" value="B"> B) float</label>
+              <label class="q-option"><input type="radio" name="q4" value="C"> C) str</label>
+              <label class="q-option"><input type="radio" name="q4" value="D"> D) bool</label>
+            </div>
+          </article>
+
+          <!-- Q5 -->
+          <article class="q-card">
+            <div class="q-head">
+              <div><strong>Q5.</strong> Which operator is used for exponentiation in Python?</div>
+            </div>
+            <div class="q-answers">
+              <label class="q-option"><input type="radio" name="q5" value="A" required> A) ^</label>
+              <label class="q-option"><input type="radio" name="q5" value="B"> B) **</label>
+              <label class="q-option"><input type="radio" name="q5" value="C"> C) // </label>
+              <label class="q-option"><input type="radio" name="q5" value="D"> D) %%</label>
+            </div>
+          </article>
+
+          <!-- Actions -->
+          <div class="q-actions">
+            <button class="submit" type="submit">Submit Quiz</button>
+            <a class="takeHome" href="learner.html">Cancel</a>
+          </div>
+        </form>
+
+      </section>
+    </div>
+  </main> 
+
   <footer>
     <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
   </footer>
