@@ -52,13 +52,20 @@
       font-size: 1.5em;
     }
 
+    .box {
+      max-width: 46.875em;
+      margin: 1.25em auto;
+      background: #fff;
+      border-radius: 0.5em;
+      box-shadow: 0 0.125em 0.375em rgba(0,0,0,0.05);
+      padding: 1.25em;
+    }
+
     fieldset {
       border: 0.0625em solid #ddd;
       padding: 1.25em;
       border-radius: 0.5em;
-      margin-top: 1.25em;
       background: #fff;
-      box-shadow: 0 0.125em 0.375em rgba(0,0,0,0.05);
     }
     legend {
       font-weight: bold;
@@ -180,17 +187,19 @@
   <main class="card-container">
     <h2>Create Your Account</h2>
 
-    <fieldset>
-      <legend>User Type:</legend>
-      <div class="radio-group">
-        <label>
-          <input type="radio" name="userType" value="learner" checked> Learner
-        </label>
-        <label>
-          <input type="radio" name="userType" value="educator"> Educator
-        </label>
-      </div>
-    </fieldset>
+    <div class="box">
+      <fieldset>
+        <legend>User Type:</legend>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="userType" value="learner" checked> Learner
+          </label>
+          <label>
+            <input type="radio" name="userType" value="educator"> Educator
+          </label>
+        </div>
+      </fieldset>
+    </div>
 
     <form id="learnerForm" class="form-box">
       <fieldset>
@@ -205,7 +214,6 @@
         <input type="email" placeholder=" learner@example.com" required />
         <label>Password:</label>
         <input type="password" placeholder=" StrongPass123" required />
-
         <div class="btn-group">
           <a href="learner_home.html" class="btn btn-learners">Sign Up Learner’s Homepage</a>
           <a href="educator_home.html" class="btn btn-educators">Sign Up Educator’s Homepage</a>
@@ -232,7 +240,6 @@
           <input type="checkbox" name="topics" value="IoT"> IoT<br>
           <input type="checkbox" name="topics" value="Cybersecurity"> Cybersecurity<br>
         </div>
-
         <div class="btn-group">
           <a href="learner_home.html" class="btn btn-learners">Sign Up Learner’s Homepage</a>
           <a href="educator_home.html" class="btn btn-educators">Sign Up Educator’s Homepage</a>
