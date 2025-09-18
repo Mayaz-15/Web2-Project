@@ -244,5 +244,23 @@
   <footer>
     &copy; 2025 learnIT. All rights reserved.
   </footer>
+
+  <script>
+    const learnerForm = document.getElementById("learnerForm");
+    const educatorForm = document.getElementById("educatorForm");
+    const radios = document.querySelectorAll('input[name="userType"]');
+
+    radios.forEach(radio => {
+      radio.addEventListener("change", () => {
+        if (radio.value === "learner") {
+          learnerForm.classList.remove("hidden");
+          educatorForm.classList.add("hidden");
+        } else {
+          educatorForm.classList.remove("hidden");
+          learnerForm.classList.add("hidden");
+        }
+      });
+    });
+  </script>
 </body>
 </html>
