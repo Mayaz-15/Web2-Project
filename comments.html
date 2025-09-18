@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comments</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+   
+.comments-section  {
+      width:70rem;
+      margin: 2em auto;
+      padding: 2.5rem;
+      background: #fff;
+      border-radius: 0.625rem;
+     box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1);
+
+      max-height: 37.5rem;
+      overflow-y: auto;
+    }
+	
+
+    .comments-section h2 {
+      text-align: center;
+      margin-bottom: 1.5625rem;
+      font-size: 2.5rem;
+     
+    }
+
+    .comment {
+      padding: 1.25rem;
+	  
+      margin-bottom: 0.9375rem;
+      border: 1px solid #ddd;
+      border-radius: 0.375rem;
+      background: #f9f9f9;
+      transition: 0.3s;
+    }
+
+    
+    .comment:hover {
+      background: #f1f9f6;  
+      box-shadow: 0 1.125rem 0.5rem rgba(0,0,0,0.1);
+    }
+
+    .comment .author,
+    .comment .date,
+    .comment .text {
+     
+    }
+.comment .author {
+  font-weight: bold;
+  color: #333;
+}
+
+.comment .date {
+  font-size: 0.9em;
+  color: #777;  
+}
+
+.comment .text {
+  margin-top: 0.5rem;
+  color: #444;
+}
+
+
+
+
+
+
+ .comments-section::-webkit-scrollbar {
+  width: 8px;
+}
+
+ .comments-section::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 0.625rem;
+}
+
+ .comments-section::-webkit-scrollbar-thumb {
+  background: #003366; 
+  border-radius: 0.625rem;
+}
+
+ .comments-section::-webkit-scrollbar-thumb:hover {
+  background: #4fc3f7; 
+}
+
+
+.comments-section  {
+  scrollbar-width: thin;
+  scrollbar-color: #003366 #f1f1f1;
+}
+
+.commentback {
+text-align: right;
+margin-bottom:15px;
+}
+
+	 	 
+ 
+	 
+	 
+	 
+
+  </style>
+
+  
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="images/logo.png" alt="LearnIT Logo">
+      <h1>LearnIT</h1>
+    </div>
+    <nav>
+      <a href="educator.html">Home</a>
+      
+    </nav>
+  </header>
+  
+   
+
+<section class="comments-section">
+    <h2>Quiz Comments</h2>
+
+ <div class="commentback">
+<a class="takeHome" href="educator.html">Back to Educator Home</a>
+</div>
+
+    <div class="comment">
+      <div class="author">💬 Anonymous</div>
+      <div class="date">Sep 3, 2025 - 9:10 PM</div>
+      <div class="text">Very useful quiz! It really helped me practice what I studied.</div>
+    </div>
+
+    <div class="comment">
+      <div class="author">💬 Anonymous</div>
+      <div class="date">Sep 1, 2025 - 6:20 PM</div>
+      <div class="text">Some questions were tricky, but that made it more challenging!</div>
+    </div>
+
+    <div class="comment">
+      <div class="author">💬 Anonymous</div>
+      <div class="date">Aug 29, 2025 - 4:50 PM</div>
+      <div class="text">Great quiz! It was fun and easy to follow.</div>
+    </div>
+
+    <div class="comment">
+      <div class="author">💬 Anonymous</div>
+      <div class="date">Aug 27, 2025 - 8:05 PM</div>
+      <div class="text">I liked the design of the quiz, very clean and easy to use.</div>
+    </div>
+
+    <div class="comment">
+      <div class="author">💬 Anonymous</div>
+      <div class="date">Aug 24, 2025 - 7:40 PM</div>
+      <div class="text">The quiz was nice, but I think some questions were a bit too long.</div>
+    </div>
+
+    <div class="comment">
+      <div class="author">💬 Anonymous</div>
+      <div class="date">Aug 21, 2025 - 2:15 PM</div>
+      <div class="text">Good coverage of the topic, but maybe add more hints next time.</div>
+    </div>
+  </section>
+
+
+ 
+
+  
+  <footer>
+    <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
+  </footer>
+</body>
+</html>
