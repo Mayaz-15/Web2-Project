@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Results | LearnIT</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+   
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.25em;
+    }
+
+    #result {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.25em;
+    }
+
+    #vid {
+      display: block;
+      margin: 0 auto 1.875em auto;
+      width: 60%;
+      border: 0.125em solid #ccc;
+      border-radius: 0.625em;
+    }
+
+    form{
+      display: flex;
+      flex-direction: column;
+      gap: 0.938em;
+    }
+
+    fieldset {
+      border: 0.062em solid #ddd;
+      padding: 1.25em;
+      border-radius: 0.5em;
+    }
+
+    legend {
+      font-weight: bold;
+      padding: 0 0.625em;
+    }
+
+    label {
+      display: block;
+      margin: 0.625em 0 0.312em;
+    }
+
+    select, textarea {
+      width: 100%;
+      padding: 0.625em;
+      border-radius: 0.312em;
+      border: 0.062em solid #ccc;
+    }
+
+    textarea {
+      min-height: 5.0em;
+      resize: vertical;
+    }
+	
+	#q { display:flex; align-items:center; gap: 0.75rem; flex-wrap: wrap; }
+
+
+
+
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">
+      <img src="images/logo.png" alt="LearnIT Logo">
+      <h1>LearnIT</h1>
+    </div>
+    <nav>
+      <a href="learner.html">Home</a>
+    </nav>
+  </header>
+
+  <div class="card-container">
+    <h2>Quiz Results</h2>
+    
+    <div id="result">
+      Congratulations! You got <strong>100%</strong>!
+    </div>
+
+    <video id="vid" src="images/cheer.mp4" autoplay muted loop>
+      Sorry, your browser doesn't support embedded videos.
+    </video>
+
+    <form>
+      <fieldset>
+        <legend>Rate the Quiz!</legend>
+
+        <label for="rating">How was the quiz?</label>
+        <select id="rating" name="rating">
+          <option value="" disabled selected>Select rating</option>
+          <option value="1">Poor</option>
+          <option value="2">Bad</option>
+          <option value="3">Average</option>
+          <option value="4">Good</option>
+          <option value="5">Excellent</option>
+        </select>
+
+        <label for="comments">Would you like to leave a comment?</label>
+        <textarea id="comments" name="comments" placeholder="Please share your thoughts!"></textarea>
+      </fieldset>
+
+      <div id="q">
+        <button type="button" class="submit" onClick="re()">Submit Feedback</button>
+        <a class="takeHome" href="learner.html">Return Home</a>
+      </div>
+    </form>
+    </div>
+
+
+  <footer>
+    <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
+  </footer>
+
+  <script>
+  function re(){
+  window.location.replace("learner.html");
+  
+  }
+  
+  </script>
+  
+</body>
+</html>
