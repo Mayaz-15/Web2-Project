@@ -1,0 +1,246 @@
+/* ===========================
+   HEADER / GLOBAL LAYOUT
+   =========================== */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h2 {
+  padding-left: .525rem;
+}
+
+header p {
+  padding-right: .525rem;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.logOutF {
+  text-align: right;
+}
+
+.Logout {
+  float: right;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.learnerh2, .EducatorH2 {
+  clear: left;
+}
+
+
+/* ===========================
+   DASHBOARD / PROFILE CARD
+   =========================== */
+
+.dashboardF {
+  display: flex;
+  gap: 1.875rem;
+  align-items: flex-start;
+}
+
+.welcomeF {
+  flex: 1;
+}
+
+.infoF {
+  padding-top: .625rem;
+  padding-left: .625rem;
+  border: .125rem solid black;
+  flex: 1;
+  clear: left;
+  background-color: #f5fafc;
+}
+
+.infoF p {
+  padding-bottom: .625rem;
+}
+
+.pfp-F {
+  width: 6rem;
+  height: 6rem;
+  float: right;
+  padding-right: 1.25rem;
+  padding-bottom: 1.45rem;
+}
+
+
+/* ===========================
+   QUIZ HEADERS / CONTROLS
+   =========================== */
+
+.quiz-headerAvailableQizzes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .625rem;
+}
+
+.quiz-headerAvailableQizzes h3 {
+  margin: 0; /* remove default margin for clean alignment */
+}
+
+.QuizheaderContainer2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#QTDropDownF {
+  width: 6.5rem;
+  height: 2rem;
+  margin-top: 1rem;
+  margin-right: 1rem;
+  border-radius: .5rem;
+  justify-content: center;
+  align-items: center;
+  padding: .5rem;
+ 
+}
+
+.filter {
+  align-items: center;
+  width: 5rem;
+  height: 2rem;
+  margin-top: 1rem;
+  padding: 0 .9375rem;
+  align-items: center;
+  justify-content: center;
+  
+  
+}
+
+
+/* ===========================
+   TABLES (AVAILABLE / REC QS)
+   =========================== */
+
+.Available_Quizzes-F, .recQS-F {
+  border: .0625rem solid black;
+  width: 100%;
+  min-width: 31.25rem;
+}
+
+table {
+}
+
+thead {
+  background-color: #34495e;
+  color: white;
+}
+
+th, td {
+  border: .0625rem solid black;
+  padding: .625rem;
+  color:#0
+}
+
+td {
+  color:#00224B;
+}
+
+td {
+ background-color: #f5fafc;
+}
+
+
+
+.Available_Quizzes-F td:nth-child(2),
+.Available_Quizzes-F td:nth-child(4) {
+  text-align: center;          
+  vertical-align: middle;      
+  white-space: nowrap;         
+}
+
+/* Keep the little 2x2 stats table visually */
+.Available_Quizzes-F td:nth-child(3) table {
+  margin: 0 auto;              
+}
+.Available_Quizzes-F td:nth-child(3) td {
+  text-align: center;
+  padding: .25rem .5rem;
+}
+
+/* Make the Comments link look a bit larger/clickable */
+.Available_Quizzes-F td:nth-child(4) a {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ===== Available Quizzes: center "Number Of Questions" + "Quiz Feedback" ===== */
+.Available_Quizzes-F th:nth-child(3),
+.Available_Quizzes-F th:nth-child(4),
+.Available_Quizzes-F td:nth-child(3),
+.Available_Quizzes-F td:nth-child(4) {
+  text-align: center;      
+  vertical-align: middle;  
+}
+
+.Available_Quizzes-F td:nth-child(3) table {
+  margin: 0 auto;
+}
+
+.Available_Quizzes-F td:nth-child(4) a {
+  display: inline-block;
+}
+
+/* ===== Recommend Questions: center "Status" + "Comments" ===== */
+.recQS-F th:nth-child(4),
+.recQS-F th:nth-child(5),
+.recQS-F td:nth-child(4),
+.recQS-F td:nth-child(5) {
+  text-align: center;      
+  vertical-align: middle;  
+  white-space: nowrap;     
+}
+
+caption {
+  font-weight: bold;
+  font-size: 1.20rem;
+  text-align: left;
+  padding-bottom: .3125rem;
+}
+
+
+/* ===========================
+   RECOMMENDATION HEADER BAR
+   =========================== */
+
+.RECQS {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .625rem;
+}
+
+
+/* ===========================
+   FORM ELEMENTS
+   =========================== */
+
+textarea {
+  width: 15rem;
+  height: 2rem;
+  resize: none;
+  overflow-y: auto;
+}
+
+input[type="radio"] {
+  vertical-align: middle; 
+  position: relative;
+  top: -.45rem; 
+}
+
+
+/* ===========================
+   MISC / UTILITIES
+   =========================== */
+
+.opt {
+  flex: 1;
+}
