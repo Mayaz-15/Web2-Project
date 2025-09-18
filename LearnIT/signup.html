@@ -165,4 +165,84 @@
   </style>
 </head>
 <body>
-  <!-- بقية الكود مثل
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Logo">
+      <h1>learnIT</h1>
+    </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="login.html">Login</a>
+      <a href="signup.html">Sign Up</a>
+    </nav>
+  </header>
+
+  <main class="card-container">
+    <h2>Create Your Account</h2>
+
+    <fieldset>
+      <legend>User Type:</legend>
+      <div class="radio-group">
+        <label>
+          <input type="radio" name="userType" value="learner" checked> Learner
+        </label>
+        <label>
+          <input type="radio" name="userType" value="educator"> Educator
+        </label>
+      </div>
+    </fieldset>
+
+    <form id="learnerForm" class="form-box">
+      <fieldset>
+        <legend>Learner Form</legend>
+        <label>First Name:</label>
+        <input type="text" placeholder=" Sara" required />
+        <label>Last Name:</label>
+        <input type="text" placeholder=" Al-Qahtani" required />
+        <label>Profile Image:</label>
+        <input type="file" id="learnerImage" accept="image/*" />
+        <label>Email:</label>
+        <input type="email" placeholder=" learner@example.com" required />
+        <label>Password:</label>
+        <input type="password" placeholder=" StrongPass123" required />
+
+        <div class="btn-group">
+          <a href="learner_home.html" class="btn btn-learners">Sign Up Learner’s Homepage</a>
+          <a href="educator_home.html" class="btn btn-educators">Sign Up Educator’s Homepage</a>
+        </div>
+      </fieldset>
+    </form>
+
+    <form id="educatorForm" class="hidden form-box">
+      <fieldset>
+        <legend>Educator Form</legend>
+        <label>First Name:</label>
+        <input type="text" placeholder=" Ghala" required />
+        <label>Last Name:</label>
+        <input type="text" placeholder=" Al-Otaibi" required />
+        <label>Profile Image:</label>
+        <input type="file" id="educatorImage" accept="image/*" />
+        <label>Email:</label>
+        <input type="email" placeholder=" educator@example.com" required />
+        <label>Password:</label>
+        <input type="password" placeholder=" EduPass2025" required />
+        <label>Specialized Topics:</label>
+        <div>
+          <input type="checkbox" name="topics" value="AI"> AI<br>
+          <input type="checkbox" name="topics" value="IoT"> IoT<br>
+          <input type="checkbox" name="topics" value="Cybersecurity"> Cybersecurity<br>
+        </div>
+
+        <div class="btn-group">
+          <a href="learner_home.html" class="btn btn-learners">Sign Up Learner’s Homepage</a>
+          <a href="educator_home.html" class="btn btn-educators">Sign Up Educator’s Homepage</a>
+        </div>
+      </fieldset>
+    </form>
+  </main>
+
+  <footer>
+    &copy; 2025 learnIT. All rights reserved.
+  </footer>
+</body>
+</html>
