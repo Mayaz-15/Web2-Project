@@ -1,0 +1,513 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Educators HomePage </title>
+
+    <link rel="stylesheet" href="Style_fatema.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+      .learneredu {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        height: 100%;
+      }
+
+      .learneredu img {
+        width: 3rem;
+        height: 3rem;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 0.3rem;
+      }
+
+      .learneredu p {
+        margin: 0;
+      }
+
+      .learneredu2 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        height: 100%;
+      }
+
+      .learneredu2 img {
+        width: 2rem;
+        height: 2rem;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 0.3rem;
+      }
+
+      .learneredu2 p {
+        margin: 0;
+      }
+
+      .comment_txtarea {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .ANSYorN {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .submit {
+        padding-top: .5rem;
+        padding-left: 4rem;
+        padding-right: 1rem;
+      }
+
+      .submit-btn {
+        background-color: #5dade2;
+        border: none;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.375rem;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+      }
+	  
+	  
+	  
+	  /*#38B2AC*/
+
+}
+
+      .submit-btn:hover {
+        background: #319A95;
+        transform: scale(1.05);
+      }
+
+      .question-answers {
+        padding-left: 1rem;
+      }
+
+      .correct {
+        background-color: #d1f7d1;   /* light green highlight */
+        font-weight: bold;
+        border-radius: 0.3125rem;
+        padding: 0.125rem 0.25rem;
+      }
+
+      .CommentCell {
+        padding-top: 0rem;
+        font-size: 1rem;
+      }
+    </style>
+	
+  </head>
+
+
+
+
+		
+
+		
+
+	</head>
+
+
+	<body> 
+
+
+
+		
+		 <header>
+		 
+		<div class="logo">
+		
+		  <img src="images/logo.png" alt="LearnIT Logo">
+		  <h1>LearnIT</h1>
+		  
+		</div>
+		<nav>
+		  <a href="index.html">Home</a>
+		 
+		</nav>
+  </header>
+		
+		
+
+		
+		  <main class = "card-container">
+				<div class= "Logout">
+				
+				<a href= "index.html">Log-out </a>
+				
+				</div>
+		  
+				<h2 class="EducatorH2">Educator</h2>
+				
+				
+				
+				
+				<div class= "dashboardF">
+				
+				
+				<div class= "welcomeF">
+				
+				
+				
+				<h4>Welcome [Name] </h4>
+				
+				<br>
+				<p>Educator dashboard with quizzes and recommended questions.</p>
+	
+				</div>
+				
+				
+				
+	<br>
+	
+	
+				
+			
+			
+			<div class= "infoF" >
+			
+			<p>First Name : Hessah</p>
+			<img src= "images/pfp.png" alt= "Profile Picture" class= "pfp-F" >
+			<p>Last Name : AlQarni</p>
+			<p>Email : HessahQarni@gmail.com</p>
+			
+			
+
+
+			
+		</div>
+		
+
+
+				</div>
+				
+<table class="Available_Quizzes-F">
+  <div class="quiz-headerAvailableQizzes">
+    <h3>Your Quizzes</h3>
+  </div>
+
+  <colgroup>
+    <col style="width: 40%;">
+    <col style="width: 20%;">
+    <col style="width: 20%;">
+    <col style="width: 20%;">
+  </colgroup>
+
+  <thead>
+    <tr>
+      <th>Topic</th>
+      <th>Number Of Questions</th>
+      <th>Quiz Statistics</th>
+      <th>Quiz Feedback</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td><a href="quiz.html">AI - python101</a></td>
+      <td>15 QS</td>
+      <td>
+        <table style="width:100%; border-collapse:collapse;">
+          <tr>
+            <td><strong>Takers:</strong> 48</td>
+            <td><strong>Avg:</strong> 87%</td>
+          </tr>
+          <tr>
+            <td><strong>Time:</strong> 10m40s</td>
+            <td><strong>Pass:</strong> 81%</td>
+          </tr>
+        </table>
+      </td>
+      <td>
+        <p><strong>Average Rating:</strong> 4.5 / 5</p>
+        <a href="comments.html">Comments</a>
+      </td>
+    </tr>
+
+    <tr>
+      <td><a href="quiz.html">Cybersecurity -Cybersecurity Concepts</a></td>
+      <td>10 QS</td>
+      <td>
+        <table style="width:100%; border-collapse:collapse;">
+          <tr>
+            <td><strong>Takers:</strong> 37</td>
+            <td><strong>Avg:</strong> 79%</td>
+          </tr>
+          <tr>
+            <td><strong>Time:</strong> 9m15s</td>
+            <td><strong>Pass:</strong> 72%</td>
+          </tr>
+        </table>
+      </td>
+      <td>
+        <p><strong>Average Rating:</strong> 4.2 / 5</p>
+        <a href="comments.html">Comments</a>
+      </td>
+    </tr>
+
+    <tr>
+      <td><a href="quiz.html">IoT - The Network Layer</a></td>
+      <td>20 QS</td>
+      <td>
+        <table style="width:100%; border-collapse:collapse;">
+          <tr>
+            <td><strong>Takers:</strong> 55</td>
+            <td><strong>Avg:</strong> 83%</td>
+          </tr>
+          <tr>
+            <td><strong>Time:</strong> 13m20s</td>
+            <td><strong>Pass:</strong> 76%</td>
+          </tr>
+        </table>
+      </td>
+      <td>
+        <p><strong>Average Rating:</strong> 4.3 / 5</p>
+        <a href="comments.html">Comments</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+				
+
+<br> <br> <br>
+
+
+		<table class= "recQS-F"> <!-- REC QS-->
+		
+		
+		
+		
+		
+			<h3> Questions Recomdations </h3>
+			
+					<colgroup>
+						<col style="width: 20%;">  <!-- Topic column -->
+						<col style="width: 10%;">  <!-- Learner info  -->
+						<col style="width: 20%;">  <!-- Questions -->
+						<col style="width: 15%;">  <!-- Review -->
+					</colgroup>
+			
+	
+					<thead>
+					
+						<tr>
+							<th> Topic </th>
+							<th> Learner </th>
+							<th> Question </th>
+							<th> Review </th>
+							
+						
+						</tr>
+						
+						</thead>
+						
+						<tbody>
+						
+						<tr>
+							<td>AI - python101</td>
+							<td> 
+							<div class= "learneredu">
+							<img src= "images/learneredu.png" alt= "PFP">
+							<p>Leen</p> 
+							</div>
+							</td>
+							<td>
+								<div class="question-photo">[photo]</div>
+								<div class="question-text">Which of the following is an example of supervised learning?</div>
+						
+								<ol type="A" class="question-answers">
+								  <li>Clustering</li>
+								  <li class="correct">Regression</li>
+								  <li>Association rules</li>
+								  <li>Anomaly detection</li>
+								</ol>
+							
+							</td>
+							
+							
+							<form>
+							
+							
+							<td class= "CommentCell"> 
+							
+							
+							<div Class="comment_txtarea">
+							
+							<P>Comment:</P>
+							
+							<textarea name="comment" rows="3" cols="20"></textarea>
+							</div>
+							
+							<br>
+							<br>
+							
+							<div class=ANSYorN>
+							
+							<P>Approve:</P>
+							<input type= "radio" name= "ans" value="y" checked>Yes
+							<input type= "radio" name= "ans" value="n" >No
+							
+							<div class="submit">
+							
+		
+							<input type="submit" class= "submit-btn" >
+							
+							</div>
+							
+							</div>
+							
+							</form>
+							
+					</td>
+							
+						
+						
+						
+						</tr>
+						
+						
+						<tr>
+							<td> Cybersecurity -Cybersecurity Concepts</td>
+							<td> 
+							<div class= "learneredu">
+							<img src= "images/learneredu.png" alt= "PFP">
+							<p>Rana</p> 
+							</div>
+							
+							</td>
+						<td>
+								<div class="question-photo">[photo]</div>
+								<div class="question-text">What does HTTPS stand for?</div>
+								<ol type="A" class="question-answers">
+									<li>Hyper Text Transfer Secure</li>
+									<li>Hyper Transfer Protocol Standard</li>
+									<li class="correct">Hyper Text Transfer Protocol Secure</li>
+									<li>Hyper Text Tracking Protocol System</li>
+							  </ol>
+							</td>
+							<form>
+							
+							
+							<td class= "CommentCell"> 
+							
+							
+							<div Class="comment_txtarea">
+							
+							<P>Comment:</P>
+							
+							<textarea name="comment" rows="3" cols="20"></textarea>
+							</div>
+							<br>
+							<br>
+							
+							<div class=ANSYorN>
+							
+							<P>Approve:</P>
+							<input type= "radio" name= "ans" value="y" checked>Yes
+							<input type= "radio" name= "ans" value="n" >No
+							
+							<div class="submit">
+							
+							<input type="submit" class = "submit-btn">
+							
+							</div>
+							
+							</div>
+							
+							</form>
+							
+						</td>
+						
+						
+						</tr>
+						
+						<tr>
+							<td>IoT - The Network Layer </td>
+							<td>
+							<div class= "learneredu">
+							<img src= "images/learneredu.png" alt= "PFP">
+							<p>Noura</p> 
+							</div>
+							</td>
+							<td>
+							  <div class="question-photo">[photo]</div>
+							  <div class="question-text"> Which protocol is most commonly used at the network layer in IoT devices</div>
+							  <ol type="A" class="question-answers">
+								<li>FTP</li>
+								<li>HTTP</li>
+								<li class="correct">IPv6</li>
+								<li>SMTP</li>
+							  </ol>
+							</td>
+							<form>
+							
+							
+							<td class= "CommentCell"> 
+							
+							
+							<div Class="comment_txtarea">
+							
+							<P>Comment:</P>
+							
+							
+							<textarea name="comment" rows="3" cols="20"></textarea>
+							</div>
+							<br>
+							<br>
+							
+							<div class=ANSYorN>
+							
+							<P>Approve</P>
+							<input type= "radio" name= "ans" value="y" checked>Yes
+							<input type= "radio" name= "ans" value="n" >No
+							
+							<div class="submit">
+							
+							<input type="submit" class= "submit-btn">
+							
+							</div>
+							
+							</div>
+							
+							</form>
+							
+						</td>
+						
+						</tr>
+						
+					
+				
+					
+					</tbody>
+
+
+				</table>		<!-- REC QS-->
+				
+		</main>
+				
+			<footer>
+				<p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
+			</footer>
+
+
+
+
+
+
+</body>
+
+
+</html>
