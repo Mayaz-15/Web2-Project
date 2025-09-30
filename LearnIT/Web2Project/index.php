@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Index</title>
+  <link rel="stylesheet" href="style.css">
+  
+  
+  <style>
+.home-container {
+      text-align: center;
+      padding: 2.5rem;
+    }
+
+.home-container h2{
+font-size:3.125rem ;
+}
+
+.home-img {
+  width: 100%;       
+  max-width: 31.25rem; 
+  height: auto;     
+  display: block;
+  margin: 1.25rem auto; 
+  border-radius: 0.5rem;
+
+}
+
+
+
+.welcome-card .card-container{
+  text-align: center;
+}
+
+
+
+.welcome-card p {
+  color: #003366;
+  background-color: rgba(0, 51, 102, 0.05); 
+ padding: 0.3125rem;
+  border-radius: 0.3125rem;
+  transition: 0.3s ease;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    .home-container img {
+  max-width: 31.25rem;  
+  margin: 1.875rem auto; 
+
+}
+
+
+    .home-container p {
+      max-width: 37.5rem;
+      margin: 0 auto 1.25rem;
+      font-size: 1.125rem;
+    }
+
+.cardhome1 .card-container {   
+  width: 100%;      
+  text-align: center;
+}
+
+
+.btn {
+  display: inline-block;
+ 
+}
+
+
+.signup-text1 {
+  margin-top: 0.625rem;
+  font-size: 0.875rem;
+}
+
+.signup-text1 a {
+  color: #003366;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.signup-text1 a:hover {
+  text-decoration: underline;
+}
+
+
+
+
+
+.quizzes-card{
+  display: flex;
+  justify-content: center;   
+  gap: 1.5rem;               
+  flex-wrap: wrap;           
+  max-width: 70rem;         
+  margin: 2rem auto;
+  background:#fff;
+  margin: 2em auto;
+  padding: 1.5em;
+  border-radius: 0.5em;
+  box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1);
+}
+
+.quizhome {
+  flex: 1 1 18rem;          
+  max-width: 20rem;         
+  background: #fff;
+  padding: 1rem;
+  border-radius: 0.625rem;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.quizhome img {
+  width: 100%;
+  height: 12rem;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.quizhome:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0.375rem 0.75rem rgba(0,0,0,0.2);
+}
+
+	
+	
+	
+	
+	
+	
+
+	
+	
+
+	
+	
+
+</style>
+  
+  
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="images/logo.png" alt="LearnIT Logo">
+      <h1>LearnIT</h1>
+    </div>
+    <nav>
+      <a href="index.php">Home</a>
+      <a href="login.php">Login</a>
+      <a href="signup.php">Sign Up</a>
+    </nav>
+  </header>
+  
+  
+ 
+  
+  
+<section class="home-container">
+    <h2>Welcome to LearnIT</h2>
+	
+<div class=" welcome-card card-container ">
+  <img src="images/welcome  .JPG" alt="Welcome Image" class="home-img">
+<p>
+  LearnIT is a platform designed to guide learners and educators through 
+  interactive quizzes and resources, making learning more engaging and fun.  
+  <br><em><strong>Discover your track in technology and unlock your potential with LearnIT!</em></strong>
+</p>
+
+<p><em>From quizzes to skills — your journey starts here.</em></p>
+
+</div>
+
+<hr>
+
+<div class=" cardhome1 card-container">
+  <a href="login.php" class="btn">Log in</a>
+  <p class="signup-text1">New User? <a href="signup.php">Sign Up</a></p>
+</div>
+
+
+<hr>
+
+
+<div class= " cardhome1 quizzes-card">
+  <!-- Quiz 1 -->
+  <div class="quizhome">
+    <img src="images/AI.JPG" alt="AI Quiz">
+    <h3>AI</h3>
+    <p>Step into the future — test your intelligence with AI!</p>
+  </div>
+
+  <!-- Quiz 2 -->
+  <div class="quizhome">
+    <img src="images/cybersecurity .JPG" alt="Cybersecurity Quiz">
+    <h3>Cybersecurity</h3>
+    <p>Can you outsmart the hackers? Prove your skills in Cybersecurity!</p>
+  </div>
+
+  <!-- Quiz 3 -->
+  <div class="quizhome">
+    <img src="images/IOT.JPG" alt="IoT Quiz">
+    <h3>IoT</h3>
+    <p>Explore the connected world — challenge yourself in IoT!</p>
+  </div>
+</div>
+
+
+  </section>
+
+  
+  
+  
+  
+  
+  
+ 
+  
+  
+  <footer>
+    <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
+  </footer>
+</body>
+</html>
