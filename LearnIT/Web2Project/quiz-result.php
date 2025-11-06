@@ -3,7 +3,7 @@
 session_start();
 
 
-    include_once __DIR__ . '/connect.php'; // should create $conn (mysqli)
+    include 'connect.php'; // should create $conn (mysqli)
 
     if (!$conn) { die("Connection failed: " . mysqli_connect_error()); }
  
