@@ -16,7 +16,7 @@ if ($_SESSION['user_type'] !== 'educator') {
 
 
 include "connect.php";   
-session_start();
+
    
 $quizId = 0;
 if (isset($_GET['quizID']))   { $quizId = (int)$_GET['quizID']; }
