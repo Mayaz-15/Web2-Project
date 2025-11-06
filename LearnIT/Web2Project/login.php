@@ -1,3 +1,55 @@
+<?php
+session_start();
+require_once 'connect.php'; 
+
+
+if (isset($_SESSION['user_id'])) {
+    if ($_SESSION['user_type'] === 'learner') { header('Location: learner.php'); exit; }
+    if ($_SESSION['user_type'] === 'educator') { header('Location: educator.php'); exit; }
+}
+
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+$password = trim($_POST['password'] ?? '');
+
+    if ($email === '' || $password === '') {
+        $error = 'Please enter email and password.';
+    } else {
+        $sql = "SELECT id, firstName, lastName, emailAddress, password, photoFileName, userType
+                FROM user WHERE emailAddress = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $res = $stmt->get_result();
+
+        if ($row = $res->fetch_assoc()) {
+            
+            if ($row['password'] === $password /* || password_verify($password, $row['password']) */) {
+                $_SESSION['user_id']    = (int)$row['id'];
+                $_SESSION['user_type']  = $row['userType'];   // 'learner' أو 'educator'
+                $_SESSION['first_name'] = $row['firstName'];
+                $_SESSION['last_name']  = $row['lastName'];
+                $_SESSION['email']      = $row['emailAddress'];
+                $_SESSION['photo']      = $row['photoFileName'];
+
+                if ($row['userType'] === 'learner') { header('Location: learner.php'); exit; }
+                else                                { header('Location: educator.php'); exit; }
+            } else {
+                $error = 'Incorrect email or password.';
+            }
+        } else {
+            $error = 'Incorrect email or password.';
+        }
+        $stmt->close();
+    }
+}
+?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,9 +131,30 @@ margin: 40px 1%;
 
 
 
+.error-msg { margin-top: 0.5rem; color: #b3261e; font-size: 0.95rem; }
 
 
 
+.error-msg {
+    color: #b30000;
+    background-color: #ffe5e5;
+    border: 1px solid #ffb3b3;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 15px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: bold;
+    animation: fadeIn 0.6s ease-in-out;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 
   </style>
@@ -107,14 +180,22 @@ margin: 40px 1%;
 <section class="login-section">
     <div class="login-container ">
       <h2>Login to LearnIT</h2>
-      <form>
-        <input type="email" placeholder="Email" required><br>
-        <input type="password" placeholder="Password" required><br>
-        <div>
-          <button type="button" class="btn btn-learner" onclick="location.href='learner.html'">Login as Learner</button>
-          <button type="button" class="btn btn-educator" onclick="location.href='educator.html'">Login as Educator</button>
-        </div>
-      </form>
+      
+      
+      <form method="post" action="login.php" autocomplete="off">
+  <input type="email" name="email" placeholder="Email" required><br>
+  <input type="password" name="password" placeholder="Password" required><br>
+
+  
+  <button type="submit" class="btn">Log in</button>
+
+  
+  <?php if (!empty($error)): ?>
+    <p class="error-msg"><?= htmlspecialchars($error) ?></p>
+  <?php endif; ?>
+</form>
+      
+      
     </div>
   </section>
 
