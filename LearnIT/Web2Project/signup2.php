@@ -4,70 +4,164 @@ include "db.php";
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="style.css">
-  <title>Sign-Up</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - LearnIT</title>
 
   <style>
-    h2 { color: #1f3b4d; margin-bottom: 1.25em; text-align: center; font-size: 2.5em; }
+
+    /* ✅ خلفية السماوية الفاتحة */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #e1f3f7, #d3eef3);
+    }
+
+    /* ✅ الهيدر */
+    header {
+      background-color: #163a4d;
+      color: white;
+      padding: 20px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header img {
+      height: 45px;
+    }
+
+    header nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 25px;
+      font-size: 18px;
+    }
+
+    header nav a:hover {
+      text-decoration: underline;
+    }
+
+    /* ✅ صندوق المحتوى الأبيض */
+    .card-container {
+      max-width: 900px;
+      margin: 50px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #1f3b4d;
+      font-size: 2.4em;
+      text-align: center;
+      margin-bottom: 30px;
+    }
 
     .box {
-      max-width: 46.875em; margin: 1.25em auto; background: #fff;
-      border-radius: 0.5em; box-shadow: 0 0.125em 0.375em rgba(0,0,0,0.05); padding: 1.25em;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
     }
 
-    fieldset { border: 0.0625em solid #ddd; padding: 1.25em; border-radius: 0.5em; background: #fff; }
-    legend { font-weight: bold; color: #1f3b4d; }
-
-    label { display: block; margin-top: 0.625em; font-weight: 500; font-size: 0.9375em; color: #1f3b4d; }
-
-    input[type="text"], input[type="email"], input[type="password"], input[type="file"] {
-      width: 100%; padding: 0.625em; margin-top: 0.3125em; 
-      border: 0.0625em solid #ccc; border-radius: 0.375em; font-size: 0.9375em;
+    fieldset {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
     }
 
-    .radio-group { display: flex; align-items: center; gap: 1.25em; margin: 0.9375em 0; }
-    .hidden { display:none; }
-
-    .form-box fieldset {
-      width: 100%; max-width: 46.875em; min-height: 28em;
-      display: flex; flex-direction: column; justify-content: flex-start; margin: auto;
+    legend {
+      font-weight: bold;
+      color: #1f3b4d;
+      padding: 0 8px;
     }
 
+    label {
+      display: block;
+      margin-top: 12px;
+      color: #1f3b4d;
+      font-size: 15px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 4px;
+      font-size: 15px;
+    }
+
+    /* ✅ زر واحد */
     .submit-btn {
-      display: block; width: 100%; text-align: center;
-      background: #0A3D62; color: #fff; padding: 0.8em; 
-      margin-top: 1.25em; border: none; border-radius: 0.375em;
-      font-size: 1em; cursor: pointer;
+      width: 100%;
+      padding: 15px;
+      background: #0A3D62;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 25px;
     }
-    .submit-btn:hover { background:#082a45; }
+
+    .submit-btn:hover {
+      background: #072a45;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* ✅ الفوتر */
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: white;
+      margin-top: 40px;
+      font-size: 14px;
+    }
+
   </style>
 
   <script>
-    function toggleForms(){
-      const learnerForm = document.getElementById("learnerBox");
-      const educatorForm = document.getElementById("educatorBox");
+    function toggleForms() {
+      let learnerBox = document.getElementById("learnerBox");
+      let educatorBox = document.getElementById("educatorBox");
 
-      if(document.getElementById("learnerRadio").checked){
-        learnerForm.style.display = "block";
-        educatorForm.style.display = "none";
+      if (document.getElementById("learnerRadio").checked) {
+        learnerBox.style.display = "block";
+        educatorBox.style.display = "none";
       } else {
-        learnerForm.style.display = "none";
-        educatorForm.style.display = "block";
+        learnerBox.style.display = "none";
+        educatorBox.style.display = "block";
       }
     }
   </script>
-</head>
 
+</head>
 <body>
 
-  <!-- ✅ الهيدر الأصلي كما في كودك -->
+  <!-- ✅ الهيدر النهائي -->
   <header>
     <div class="logo">
-       <img src="images/logo.png" alt="LearnIT Logo">
+      <img src="images/logo.png" alt="LearnIT Logo">
       <h1>LearnIT</h1>
     </div>
+
     <nav>
       <a href="index.php">Home</a>
       <a href="login.php">Login</a>
@@ -75,23 +169,24 @@ include "db.php";
     </nav>
   </header>
 
+  <!-- ✅ المحتوى -->
   <main class="card-container">
+
     <h2>Create Your Account</h2>
 
+    <!-- ✅ اختيار نوع المستخدم -->
     <div class="box">
       <fieldset>
         <legend>User Type:</legend>
-        <div class="radio-group">
-          <label><input type="radio" name="userType" id="learnerRadio" value="learner" checked onclick="toggleForms()"> Learner</label>
-          <label><input type="radio" name="userType" id="educatorRadio" value="educator" onclick="toggleForms()"> Educator</label>
-        </div>
+        <label><input type="radio" name="userType" id="learnerRadio" value="learner" checked onclick="toggleForms()"> Learner</label>
+        <label><input type="radio" name="userType" id="educatorRadio" value="educator" onclick="toggleForms()"> Educator</label>
       </fieldset>
     </div>
 
-    <!-- ✅ فورم واحد فقط -->
-    <form action="signup_process.php" method="POST" enctype="multipart/form-data" class="form-box">
+    <!-- ✅ النموذج كامل -->
+    <form action="signup_process.php" method="POST" enctype="multipart/form-data">
 
-      <!-- ✅ Learner form -->
+      <!-- ✅ Learner -->
       <div id="learnerBox">
         <fieldset>
           <legend>Learner Form</legend>
@@ -110,11 +205,10 @@ include "db.php";
 
           <label>Password:</label>
           <input type="password" name="password" required>
-
         </fieldset>
       </div>
 
-      <!-- ✅ Educator form -->
+      <!-- ✅ Educator -->
       <div id="educatorBox" class="hidden">
         <fieldset>
           <legend>Educator Form</legend>
@@ -137,24 +231,30 @@ include "db.php";
           <label>Specialized Topics:</label>
           <?php
             $stmt = $pdo->query("SELECT * FROM topic");
-            while($row = $stmt->fetch()){
+            while ($row = $stmt->fetch()) {
               echo '<label><input type="checkbox" name="topics[]" value="'.$row["id"].'"> '.$row["topicName"].'</label>';
             }
           ?>
         </fieldset>
       </div>
 
-      <!-- ✅ زر واحد فقط -->
+      <!-- ✅ الزر الوحيد -->
       <button type="submit" class="submit-btn">Sign Up</button>
 
     </form>
 
   </main>
 
-  <!-- ✅ الفوتر الأصلي كما في كودك -->
-  <footer>
-    &copy; 2025 learnIT. All rights reserved.
-  </footer>
+ <footer style="
+    background-color: #163a4d;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    font-size: 14px;">
+    © 2025 learnIT. All rights reserved.
+</footer>
+
 
 </body>
 </html>
