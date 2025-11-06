@@ -1,685 +1,241 @@
+<?php
+
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+if (!isset($_SESSION['user_id'], $_SESSION['user_type'])) {
+    header('Location: index.php?error=notLoggedIn');
+    exit();
+}
+if (strtolower(trim((string)$_SESSION['user_type'])) !== 'learner') {
+    header('Location: index.php?error=wrongRole');
+    exit();
+}
+
+require_once 'connect.php';
+if (!$conn) { die('Database connection failed.'); }
+
+
+/* (b) Fetch learner info */
+$userId = (int) $_SESSION['user_id'];
+$sql = "SELECT firstName, lastName, emailAddress,
+               COALESCE(NULLIF(photoFileName,''),'default.png') AS photoFileName
+        FROM user WHERE id = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $userId);
+mysqli_stmt_execute($stmt);
+$res = mysqli_stmt_get_result($stmt);
+if (!$res || mysqli_num_rows($res) === 0) {
+    header('Location: index.php?error=userMissing');
+    exit();
+}
+$user = mysqli_fetch_assoc($res);
+mysqli_stmt_close($stmt);
+
+function e($s){ return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
+
+$first = e($user['firstName']);
+$last  = e($user['lastName']);
+$email = e($user['emailAddress']);
+$photo = 'images/' . e($user['photoFileName']);
+
+/* (c) Topics dropdown */
+$topics = [];
+$tq = mysqli_query($conn, "SELECT id, topicName FROM topic ORDER BY topicName");
+while ($row = mysqli_fetch_assoc($tq)) $topics[] = $row;
+$isPost = ($_SERVER['REQUEST_METHOD'] === 'POST');
+$selectedTopicId = $isPost ? trim((string)($_POST['topicID'] ?? '')) : '';
+
+/* (d,e) Quizzes */
+if ($isPost && $selectedTopicId !== '') {
+    $quizSql = "
+        SELECT q.id AS quizID,
+               t.topicName,
+               u.firstName, u.lastName,
+               COALESCE(NULLIF(u.photoFileName,''),'default.png') AS educatorPhoto,
+               COUNT(qq.id) AS questionCount
+        FROM quiz q
+        JOIN user u ON q.educatorID = u.id
+        JOIN topic t ON q.topicID = t.id
+        LEFT JOIN quizquestion qq ON q.id = qq.quizID
+        WHERE q.topicID = ?
+        GROUP BY q.id, t.topicName, u.firstName, u.lastName, u.photoFileName
+        ORDER BY t.topicName, q.id";
+    $stmt = mysqli_prepare($conn, $quizSql);
+    mysqli_stmt_bind_param($stmt, "i", $selectedTopicId);
+    mysqli_stmt_execute($stmt);
+    $quizzes = mysqli_stmt_get_result($stmt);
+} else {
+    $quizSql = "
+        SELECT q.id AS quizID,
+               t.topicName,
+               u.firstName, u.lastName,
+               COALESCE(NULLIF(u.photoFileName,''),'default.png') AS educatorPhoto,
+               COUNT(qq.id) AS questionCount
+        FROM quiz q
+        JOIN user u ON q.educatorID = u.id
+        JOIN topic t ON q.topicID = t.id
+        LEFT JOIN quizquestion qq ON q.id = qq.quizID
+        GROUP BY q.id, t.topicName, u.firstName, u.lastName, u.photoFileName
+        ORDER BY t.topicName, q.id";
+    $quizzes = mysqli_query($conn, $quizSql);
+}
+
+/* (f) Recommended questions */
+$recSql = "
+    SELECT rq.id, rq.question, rq.questionFigureFileName,
+           rq.answerA, rq.answerB, rq.answerC, rq.answerD, rq.correctAnswer,
+           rq.status, rq.comments,
+           t.topicName,
+           u.firstName AS educatorFirst, u.lastName AS educatorLast,
+           COALESCE(NULLIF(u.photoFileName,''),'default.png') AS educatorPhoto
+    FROM recommendedquestion rq
+    JOIN quiz q ON rq.quizID = q.id
+    JOIN topic t ON q.topicID = t.id
+    JOIN user u ON q.educatorID = u.id
+    WHERE rq.learnerID = ?
+    ORDER BY rq.id DESC";
+$stmt2 = mysqli_prepare($conn, $recSql);
+mysqli_stmt_bind_param($stmt2, "i", $userId);
+mysqli_stmt_execute($stmt2);
+$recRes = mysqli_stmt_get_result($stmt2);
+?>
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Learners HomePage </title>
-
-     <!-- <link rel="stylesheet" href="Style_fatema.css"> -->
-    <link rel="stylesheet" href="style.css">
-
-    <style>
-      .question-answers {
-        padding-left: 1rem;
-      }
-
-      .learneredu {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        height: 100%;
-      }
-
-      .learneredu img {
-        width: 3rem;
-        height: 3rem;
-        object-fit: cover;
-        border-radius: 50%;
-        margin-bottom: 0.3rem;
-      }
-
-      .learneredu p {
-        margin: 0;
-      }
-
-      .learneredu2 {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        height: 100%;
-      }
-
-      .learneredu2 img {
-        width: 2rem;
-        height: 2rem;
-        object-fit: cover;
-        border-radius: 50%;
-        margin-bottom: 0.3rem;
-      }
-
-      .learneredu2 p {
-        margin: 0;
-      }
-
-      .correct {
-        background-color: #d1f7d1;   /* light green highlight */
-        font-weight: bold;
-        border-radius: 0.3125rem;
-        padding: 0.125rem 0.25rem;
-      }
-	  
-	  
-	  
-	  
-	  
-	  
-	  /* ===========================
-   HEADER / GLOBAL LAYOUT
-   =========================== */
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-header h2 {
-  padding-left: .525rem;
-}
-
-header p {
-  padding-right: .525rem;
-  font-weight: bold;
-  font-size: 1.25rem;
-}
-
-.logOutF {
-  text-align: right;
-}
-
-.Logout {
-  float: right;
-  font-size: 1.25rem;
-  font-weight: bold;
-}
-
-.learnerh2, .EducatorH2 {
-  clear: left;
-}
-
-
-/* ===========================
-   DASHBOARD / PROFILE CARD
-   =========================== */
-
-.dashboardF {
-  display: flex;
-  gap: 1.875rem;
-  align-items: flex-start;
-}
-
-.welcomeF {
-  flex: 1;
-}
-
-.infoF {
-  padding-top: .625rem;
-  padding-left: .625rem;
-  border: .125rem solid black;
-  flex: 1;
-  clear: left;
-  background-color: #f5fafc;
-}
-
-.infoF p {
-  padding-bottom: .625rem;
-}
-
-.pfp-F {
-  width: 6rem;
-  height: 6rem;
-  float: right;
-  padding-right: 1.25rem;
-  padding-bottom: 1.45rem;
-}
-
-
-/* ===========================
-   QUIZ HEADERS / CONTROLS
-   =========================== */
-
-.quiz-headerAvailableQizzes {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: .625rem;
-}
-
-.quiz-headerAvailableQizzes h3 {
-  margin: 0; /* remove default margin for clean alignment */
-}
-
-.QuizheaderContainer2 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#QTDropDownF {
-  width: 6.5rem;
-  height: 2rem;
-  margin-top: 1rem;
-  margin-right: 1rem;
-  border-radius: .5rem;
-  justify-content: center;
-  align-items: center;
-  padding: .5rem;
- 
-}
-
-.filter {
-  align-items: center;
-  width: 5rem;
-  height: 2rem;
-  margin-top: 1rem;
-  padding: 0 .9375rem;
-  align-items: center;
-  justify-content: center;
-  
-  
-}
-
-
-/* ===========================
-   TABLES (AVAILABLE / REC QS)
-   =========================== */
-
-.Available_Quizzes-F, .recQS-F {
-  border: .0625rem solid black;
-  width: 100%;
-  min-width: 31.25rem;
-}
-
-
-
-thead {
-  background-color: #34495e;
-  color: white;
-}
-
-th, td {
-  border: .0625rem solid black;
-  padding: .625rem;
-  color:#0
-}
-
-td {
-  color:#00224B;
-}
-
-td {
- background-color: #f5fafc;
-}
-
-
-
-.Available_Quizzes-F td:nth-child(2),
-.Available_Quizzes-F td:nth-child(4) {
-  text-align: center;          
-  vertical-align: middle;      
-  white-space: nowrap;         
-}
-
-/* Keep the little 2x2 stats table visually */
-.Available_Quizzes-F td:nth-child(3) table {
-  margin: 0 auto;              
-}
-.Available_Quizzes-F td:nth-child(3) td {
-  text-align: center;
-  padding: .25rem .5rem;
-}
-
-/* Make the Comments link look a bit larger/clickable */
-.Available_Quizzes-F td:nth-child(4) a {
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-decoration: underline;
-}
-
-/* ===== Available Quizzes: center "Number Of Questions" + "Quiz Feedback" ===== */
-.Available_Quizzes-F th:nth-child(3),
-.Available_Quizzes-F th:nth-child(4),
-.Available_Quizzes-F td:nth-child(3),
-.Available_Quizzes-F td:nth-child(4) {
-  text-align: center;      
-  vertical-align: middle;  
-}
-
-.Available_Quizzes-F td:nth-child(3) table {
-  margin: 0 auto;
-}
-
-.Available_Quizzes-F td:nth-child(4) a {
-  display: inline-block;
-}
-
-/* ===== Recommend Questions: center "Status" + "Comments" ===== */
-.recQS-F th:nth-child(4),
-.recQS-F th:nth-child(5),
-.recQS-F td:nth-child(4),
-.recQS-F td:nth-child(5) {
-  text-align: center;      
-  vertical-align: middle;  
-  white-space: nowrap;     
-}
-
-caption {
-  font-weight: bold;
-  font-size: 1.20rem;
-  text-align: left;
-  padding-bottom: .3125rem;
-}
-
-
-/* ===========================
-   RECOMMENDATION HEADER BAR
-   =========================== */
-
-.RECQS {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: .625rem;
-}
-
-
-/* ===========================
-   FORM ELEMENTS
-   =========================== */
-
-textarea {
-  width: 15rem;
-  height: 2rem;
-  resize: none;
-  overflow-y: auto;
-}
-
-input[type="radio"] {
-  vertical-align: middle; 
-  position: relative;
-  top: -.45rem; 
-}
-
-
-/* ===========================
-   MISC / UTILITIES
-   =========================== */
-
-.opt {
-  flex: 1;
-}
-
-	  
-	  
-	  
-    </style>
-  </head>
-
-	<body> 
-
-
-<!--		<header> 
-		
-			<h2> Welcome [name] </h2>
-			
-			<p class= "logOutF" > Log-out</p>
-		
-		
-		</header>      -->
-		
-		
-		 <header>
-		 
-		<div class="logo">
-		
-		  <img src="images/logo.png" alt="LearnIT Logo">
-		  <h1>LearnIT</h1>
-		  
-		</div>
-		<nav>
-		
-		  <a href="learner.php">Home</a>
-		 
-		 
-		</nav>
-  </header>
-		
-		
-
-		
-		  <main class = "card-container">
-				<div class= "Logout">
-				
-				<a href= "index.php">Log-out </a>
-				
-				</div>
-		  
-				<h2 class="learnerh2">Learner</h2>
-				
-				
-				
-				
-				<div class= "dashboardF">
-				
-				
-				<div class= "welcomeF">
-				
-				
-				
-				<h4>Welcome [Name] </h4>
-				
-				<br>
-				<p>Learner dashboard with available quizzes and recommended questions.</p>
-	
-				</div>
-				
-				
-				
-	<br>
-	
-	
-				
-
-
-			
-			
-			<div class= "infoF" >
-			
-			<p>First Name : Leen</p>
-			<img src= "images/pfp.png" alt= "Profile Picture" class= "pfp-F" >
-			<p>Last Name : AlMutairi</p>
-			<p>Email : LeenM@gmail.com</p>
-			
-			
-
-
-			
-		</div>
-		
-		
-		
-
-
-
-				</div>
-				
-				
-				
-	
-		<table class= "Available_Quizzes-F">  <!-- QUIZZZEESS -->
-		
-				
-			
-			
-			
-			
-			<div class="quiz-headerAvailableQizzes">
-  <h3>All Available Quizzes</h3>
-  <div class=QuizheaderContainer2>
-  
-  <select name="QuizzesTopic" id="QTDropDownF">
-	<option>All topics</option>
-    <option>AI - python101</option>
-    <option>Cybersecurity -Cybersecurity Concepts</option>
-    <option>IoT - The Network Layer</option>
-    <
-  </select>
-  <button class= "filter" > Filter </button>
-</div>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learner Homepage</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .learneredu, .learneredu2 { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+    .learneredu img, .learneredu2 img { border-radius:50%; object-fit:cover; }
+    .learneredu img { width:3rem; height:3rem; }
+    .learneredu2 img { width:2rem; height:2rem; }
+    .question-answers { padding-left:1rem; }
+    .correct { background:#c8f7c5; font-weight:bold; border-radius:.25rem; padding:.1rem .3rem; }
+    thead { background-color:#34495e; color:white; }
+    th, td { border:1px solid black; padding:.6rem; vertical-align:top; }
+    td{background-color: #f5fafc;}
+    .Available_Quizzes-F, .recQS-F { width:100%; border-collapse:collapse; margin-top:1rem; }
+    .RECQS { display:flex; justify-content:space-between; align-items:center; margin-top:2rem; margin-bottom:.5rem; }
+    .filter { padding:.3rem .8rem; border-radius:.3rem; }
+    .pfp-F { width:6rem; height:6rem; border-radius:50%; object-fit:cover; float:right; margin-right:1rem; }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="logo">
+    <img src="images/logo.png" alt="LearnIT Logo" style="width:50px; vertical-align:middle;">
+    <h1 style="display:inline-block; margin-left:.5rem;">LearnIT</h1>
+  </div>
+  <nav><a href="learner.php">Home</a></nav>
+</header>
+
+<main class="card-container">
+  <div style="text-align:right;"><a href="logout.php" class="filter">Log-out</a></div>
+  <h2 class="learnerh2">Learner</h2>
+
+  <div class="dashboardF" style="display:flex; gap:2rem;">
+    <div class="welcomeF">
+      <h4>Welcome <?= $first; ?></h4>
+      <p>Learner dashboard with available quizzes and recommended questions.</p>
+    </div>
+    <div class="infoF" style="flex:1; border:1px solid #000; background:#f5fafc; padding:1rem;">
+      <img src="<?= $photo; ?>" alt="Profile Picture" class="pfp-F">
+      <p>First Name : <?= $first; ?></p>
+      <p>Last Name : <?= $last; ?></p>
+      <p>Email : <?= $email; ?></p>
+    </div>
   </div>
 
-			
-		
-		
-				<thead>
-				
-					<tr>
-						<th> Topic </th>
-						<th> Educator </th>
-						<th> Number Of Questions </th>
-						<th>  </th>
-					
-					
-					</tr>
-					
-					</thead>
-					
-					<tbody>
-					
-					<tr>
-						<td>AI - python101</td>
-						<td> 
-							<div class= "learneredu2">
-							<img src= "images/learneredu.png" alt= "PFP">
-							<p>Sara</p> 
-							</div>
-							</td>
-						 <td> 15 QS</td>
-						<td> <a href= "take-quiz.php" > Take Quiz</a></td>
-					
-					
-					
-					</tr>
-					
-					
-					<tr>
-						<td> Cybersecurity -Cybersecurity Concepts</td>
-						<td> 
-							<div class= "learneredu2">
-							<img src= "images/learneredu.png" alt= "PFP">
-							<p>Hessah</p> 
-							</div>
-							
-							</td>
-						<td> 10 QS </td>
-						<td> <a href= "take-quiz.php" > Take Quiz</a></td>
-					
-					
-					
-					</tr>
-					
-					<tr>
-						<td> IoT - The Network Layer </td>
-						<td>
-							<div class= "learneredu2">
-							<img src= "images/learneredu.png" alt= "PFP">
-							<p>Aryam</p> 
-							</div>
-							</td>
-						<td> 20 QS</td>
-						<td> <a href= "take-quiz.php" > Take Quiz</a></td>
-					
-					
-					
-					</tr>
-					
-					
-				
-				
-				</tbody>
+  <!-- (c,d,e) Quizzes -->
+  <div class="quiz-headerAvailableQizzes" style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem;">
+    <h3>All Available Quizzes</h3>
+    <form method="post" action="learner.php" class="QuizheaderContainer2">
+      <select name="topicID" id="QTDropDownF">
+        <option value="">All topics</option>
+        <?php foreach ($topics as $t): ?>
+          <option value="<?= (int)$t['id'] ?>" <?= ($t['id'] == $selectedTopicId ? 'selected' : '') ?>>
+            <?= e($t['topicName']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+      <button type="submit" class="filter">Filter</button>
+    </form>
+  </div>
 
+  <table class="Available_Quizzes-F">
+    <thead>
+      <tr><th>Topic</th><th>Educator</th><th>Number of Questions</th><th></th></tr>
+    </thead>
+    <tbody>
+      <?php if ($quizzes && mysqli_num_rows($quizzes) > 0): ?>
+        <?php while ($q = mysqli_fetch_assoc($quizzes)): ?>
+          <?php
+            $topic  = e($q['topicName']);
+            $fname  = e($q['firstName']);
+            $lname  = e($q['lastName']);
+            $photoE = 'images/' . e($q['educatorPhoto']);
+            $count  = (int)$q['questionCount'];
+            $quizID = (int)$q['quizID'];
+          ?>
+          <tr>
+            <td><?= $topic ?></td>
+            <td><div class="learneredu2"><img src="<?= $photoE ?>" alt="Educator"><p><?= $fname ?></p></div></td>
+            <td><?= $count ?> QS</td>
+            <td><?= $count>0 ? "<a href='take-quiz.php?quizID=$quizID'>Take Quiz</a>" : "<span style='opacity:.6'>No questions</span>" ?></td>
+          </tr>
+        <?php endwhile; ?>
+      <?php else: ?><tr><td colspan="4">No quizzes found.</td></tr><?php endif; ?>
+    </tbody>
+  </table>
 
-		</table>			<!-- QUIZZZEESS -->
+  <!-- (f) Recommended Questions -->
+  <div class="RECQS">
+    <h3>Recommend Questions</h3>
+    <a href="recommend-question.php" id="recqslink">Recommend a Question</a>
+  </div>
+  <table class="recQS-F">
+    <thead>
+      <tr><th>Topic</th><th>Educator</th><th>Question</th><th>Status</th><th>Comments</th></tr>
+    </thead>
+    <tbody>
+      <?php if ($recRes && mysqli_num_rows($recRes) > 0): ?>
+        <?php while ($r = mysqli_fetch_assoc($recRes)): ?>
+          <?php
+            $topic = e($r['topicName']);
+            $eduP = 'images/' . e($r['educatorPhoto']);
+            $eduN = e($r['educatorFirst']);
+            $qText = e($r['question']);
+            $fig = trim($r['questionFigureFileName']);
+            $A = e($r['answerA']); $B = e($r['answerB']); $C = e($r['answerC']); $D = e($r['answerD']);
+            $correct = e($r['correctAnswer']);
+          ?>
+          <tr>
+            <td><?= $topic ?></td>
+            <td><div class="learneredu"><img src="<?= $eduP ?>" alt="Educator"><p><?= $eduN ?></p></div></td>
+            <td>
+              <?php if ($fig): ?><div class="question-photo"><img src="images/<?= e($fig) ?>" alt="Figure" style="width:90px;"></div><?php endif; ?>
+              <div class="question-text"><?= $qText ?></div>
+              <ol type="A" class="question-answers">
+                <li<?= $correct=='A'?' class="correct"':'' ?>><?= $A ?></li>
+                <li<?= $correct=='B'?' class="correct"':'' ?>><?= $B ?></li>
+                <li<?= $correct=='C'?' class="correct"':'' ?>><?= $C ?></li>
+                <li<?= $correct=='D'?' class="correct"':'' ?>><?= $D ?></li>
+              </ol>
+            </td>
+            <td><?= e(ucfirst($r['status'])) ?></td>
+            <td><?= e($r['comments']) ?></td>
+          </tr>
+        <?php endwhile; ?>
+      <?php else: ?><tr><td colspan="5">No recommended questions yet.</td></tr><?php endif; ?>
+    </tbody>
+  </table>
+</main>
 
-				
-
-<br> <br> <br>
-
-
-		<table class= "recQS-F"> <!-- REC QS-->
-		
-		
-		<div class= "RECQS">
-		
-		
-			<h3> Recommend Questions </h3>
-			
-			<a href="recommend-question.html" id="recqslink" >Recommend a Question </a>
-			
-		</div>
-					<thead>
-					
-						<tr>
-							<th> Topic </th>
-							<th> Educator </th>
-							<th> Question </th>
-							<th> Status </th>
-							<th> Comments </th>
-						
-						</tr>
-						
-						</thead>
-						
-						<tbody>
-						
-						<tr>
-							<td>AI - python101</td>
-							<td> 
-							<div class= "learneredu">
-							<img src= "images/learneredu.png" alt= "PFP">
-							<p>Sara</p> 
-							</div>
-							</td>
-					
-							<td>
-								<div class="question-photo">[photo]</div>
-								<div class="question-text">Which of the following is an example of supervised learning?</div>
-						
-								<ol type="A" class="question-answers">
-								  <li>Clustering</li>
-								  <li class="correct">Regression</li>
-								  <li>Association rules</li>
-								  <li>Anomaly detection</li>
-								</ol>
-							
-							</td>
-							
-							<td> Approved</td>
-							 <td>Clear and relevant question for beginners.</td>
-						
-						
-						
-						</tr>
-						
-						
-						<tr>
-							<td> Cybersecurity -Cybersecurity Concepts</td>
-							<td> 
-							<div class= "learneredu">
-							<img src= "images/learneredu.png" alt= "PFP">
-							<p>Hessah</p> 
-							</div>
-							
-							</td>
-							<td> 
-								<div class="question-photo">[photo]</div>
-								<div class="question-text">What does HTTPS stand for?</div>
-								<ol type="A" class="question-answers">
-									<li>Hyper Text Transfer Secure</li>
-									<li>Hyper Transfer Protocol Standard</li>
-									<li class="correct">Hyper Text Transfer Protocol Secure</li>
-									<li>Hyper Text Tracking Protocol System</li>
-							  </ol>
-							</td>
-							<td> Dissaproved</td>
-							<td> Great question! But it has already been recommended by another student.</td>
-						
-						
-						
-						</tr>
-						
-						<tr>
-							<td> IoT - The Network Layer </td>
-							<td>
-							<div class= "learneredu">
-							<img src= "images/learneredu.png" alt= "PFP">
-							<p>Aryam</p> 
-							</div>
-							</td>
-							
-							<td>
-							  <div class="question-photo">[photo]</div>
-							  <div class="question-text"> Which protocol is most commonly used at the network layer in IoT devices</div>
-							  <ol type="A" class="question-answers">
-								<li>FTP</li>
-								<li>HTTP</li>
-								<li class="correct">IPv6</li>
-								<li>SMTP</li>
-							  </ol>
-							</td>
-
-							<td> Pending</td>
-							<td>  </td>
-						
-						
-						</tr>
-						
-					
-				
-					
-					</tbody>
-
-
-				</table>		<!-- REC QS-->
-				
-		</main>
-				
-			<footer>
-				<p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
-			</footer>
-
-
-<script>
-  (function () {
-    // dropdown (ID)
-    const filterSelect = document.getElementById('QTDropDownF');
-    // filter button (class)
-    const filterBtn = document.querySelector('.filter');
-    // table (class)
-    const table = document.querySelector('.Available_Quizzes-F');
-    // all rows inside table body
-    const rows = Array.from(table.querySelectorAll('tbody tr'));
-
-    function normalize(str) {
-      return (str || '').toLowerCase().trim();
-    }
-
-    function filterQuizzes() {
-      const selected = normalize(filterSelect.value);
-      rows.forEach(tr => {
-        const topicText = normalize(tr.cells[0]?.textContent);
-        // if "All topics" → show everything
-        if (selected === 'all topics') {
-          tr.style.display = '';
-        } else {
-          // otherwise show only rows where topic matches
-          tr.style.display = topicText === selected ? '' : 'none';
-        }
-      });
-    }
-
-    // run only when Filter button is clicked
-    filterBtn.addEventListener('click', filterQuizzes);
-
-  })();
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
+<footer>
+  <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
+</footer>
 </body>
-
-
 </html>
