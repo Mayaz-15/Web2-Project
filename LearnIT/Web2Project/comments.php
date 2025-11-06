@@ -1,3 +1,48 @@
+<?php
+session_start();
+
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
+
+if ($_SESSION['user_type'] !== 'educator') {
+    header("Location: index.php");
+    exit();
+}
+
+
+
+include "connect.php";   
+session_start();
+   
+$quizId = 0;
+if (isset($_GET['quizID']))   { $quizId = (int)$_GET['quizID']; }
+elseif (isset($_GET['quiz_id'])) { $quizId = (int)$_GET['quiz_id']; }
+
+$comments = [];
+if ($quizId > 0) {
+    $sql  = "SELECT id, comments, date
+             FROM quizfeedback
+             WHERE quizID = ?
+             ORDER BY date DESC, id DESC";  
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $quizId);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    while ($row = $res->fetch_assoc()) {
+        $comments[] = $row;
+    }
+    $stmt->close();
+}
+?>
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -109,6 +154,7 @@ margin-bottom:15px;
   
 </head>
 <body>
+    <div class="comments-wrapper" > 
   <header>
     <div class="logo">
       <img src="images/logo.png" alt="LearnIT Logo">
@@ -123,48 +169,37 @@ margin-bottom:15px;
    
 
 <section class="comments-section">
-    <h2>Quiz Comments</h2>
+  <h2>Quiz Comments</h2>
 
- <div class="commentback">
-<a class="takeHome" href="educator.php">Back to Educator Home</a>
-</div>
+  <div class="commentback">
+    <a class="takeHome" href="educator.php">Back to Educator Home</a>
+  </div>
 
+  <?php if ($quizId === 0): ?>
     <div class="comment">
-      <div class="author">💬 Anonymous</div>
-      <div class="date">Sep 3, 2025 - 9:10 PM</div>
-      <div class="text">Very useful quiz! It really helped me practice what I studied.</div>
+      <div class="text">No quiz selected. Open this page from the “Comments” link of a quiz.</div>
     </div>
-
+  <?php elseif (empty($comments)): ?>
     <div class="comment">
-      <div class="author">💬 Anonymous</div>
-      <div class="date">Sep 1, 2025 - 6:20 PM</div>
-      <div class="text">Some questions were tricky, but that made it more challenging!</div>
+      <div class="text">No comments yet.</div>
     </div>
+  <?php else: ?>
+    <?php foreach ($comments as $c): ?>
+      <div class="comment">
+        <div class="author">💬 Anonymous</div>
+        <div class="date">
+          <?=
+            htmlspecialchars(
+              date('M j, Y – g:i A', strtotime($c['date']))
+            );
+          ?>
+        </div>
+        <div class="text"><?= nl2br(htmlspecialchars($c['comments'])) ?></div>
+      </div>
+    <?php endforeach; ?>
+  <?php endif; ?>
+</section>
 
-    <div class="comment">
-      <div class="author">💬 Anonymous</div>
-      <div class="date">Aug 29, 2025 - 4:50 PM</div>
-      <div class="text">Great quiz! It was fun and easy to follow.</div>
-    </div>
-
-    <div class="comment">
-      <div class="author">💬 Anonymous</div>
-      <div class="date">Aug 27, 2025 - 8:05 PM</div>
-      <div class="text">I liked the design of the quiz, very clean and easy to use.</div>
-    </div>
-
-    <div class="comment">
-      <div class="author">💬 Anonymous</div>
-      <div class="date">Aug 24, 2025 - 7:40 PM</div>
-      <div class="text">The quiz was nice, but I think some questions were a bit too long.</div>
-    </div>
-
-    <div class="comment">
-      <div class="author">💬 Anonymous</div>
-      <div class="date">Aug 21, 2025 - 2:15 PM</div>
-      <div class="text">Good coverage of the topic, but maybe add more hints next time.</div>
-    </div>
-  </section>
 
 
  
@@ -173,5 +208,30 @@ margin-bottom:15px;
   <footer>
     <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
   </footer>
+    </div>     
 </body>
 </html>
+
+
+<style> 
+ 
+.comments-wrapper {
+  min-height: 100vh;         
+  display: flex;
+  flex-direction: column;
+}
+
+.comments-wrapper header {
+  flex: 0 0 auto;
+}
+
+.comments-wrapper .comments-section {
+  flex: 1 0 auto;            
+}
+
+.comments-wrapper footer {
+  margin-top: auto;          
+}
+
+</style> 
+  
