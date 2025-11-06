@@ -2,14 +2,11 @@
 
 session_start();
 
-// --- DB connect: include if available, otherwise connect manualy---
-if (file_exists(__DIR__ . '/connect.php')) {
+
     include_once __DIR__ . '/connect.php'; // should create $conn (mysqli)
-} else {
-    $conn = mysqli_connect("localhost", "root", "root", "dblearnit");
+
     if (!$conn) { die("Connection failed: " . mysqli_connect_error()); }
-    mysqli_set_charset($conn, "utf8mb4");
-}
+ 
 
 // --- Session check---
 if (!isset($_SESSION['id']) || !isset($_SESSION['userType']) || $_SESSION['userType'] !== 'learner') {
