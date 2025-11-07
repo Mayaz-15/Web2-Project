@@ -8,69 +8,61 @@ include "db.php";
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign Up - LearnIT</title>
 
+  <!-- ✅ CSS داخلي كامل -->
   <style>
 
-    /* ✅ خلفية السماوية الفاتحة */
+    /* خلفية الصفحة */
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #e1f3f7, #d3eef3);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #eef5f9, #d9f0f3);
+      color: #2e3a45;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
     }
 
-    /* ✅ الهيدر */
+    /* ✅ Header */
     header {
-      background-color: #163a4d;
-      color: white;
-      padding: 20px 60px;
+      background: #1f3b4d;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 0.938em 2.5em;
+      border-bottom: 0.188em solid #d9f0f3;
+      color: #fff;
     }
 
-    header .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    header img {
-      height: 45px;
-    }
+    header .logo { display: flex; align-items: center; }
+    header .logo img { height: 2.812em; margin-right: 0.625em; }
+    header .logo h1 { font-size: 1.375em; letter-spacing: 0.062em; }
 
     header nav a {
-      color: white;
+      margin: 0 0.938em;
       text-decoration: none;
-      margin-left: 25px;
-      font-size: 18px;
+      color: #eaf6fb;
+      font-weight: 500;
+      transition: color 0.3s;
     }
+    header nav a:hover { color: #aed6f1; }
 
-    header nav a:hover {
-      text-decoration: underline;
-    }
-
-    /* ✅ صندوق المحتوى الأبيض */
+    /* ✅ White Card */
     .card-container {
-      max-width: 900px;
-      margin: 50px auto;
-      background: white;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 70rem;
+      max-width: 90%;
+      margin: 3em auto;
+      padding: 2em;
+      background-color: #ffffff;
+      border-radius: 0.5em;
+      box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1);
     }
 
     h2 {
-      color: #1f3b4d;
-      font-size: 2.4em;
       text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .box {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      margin-bottom: 20px;
+      color: #1f3b4d;
+      font-size: 2.2rem;
+      margin-bottom: 1em;
     }
 
     fieldset {
@@ -105,7 +97,7 @@ include "db.php";
       font-size: 15px;
     }
 
-    /* ✅ زر واحد */
+    /* ✅ Submit Button */
     .submit-btn {
       width: 100%;
       padding: 15px;
@@ -117,22 +109,20 @@ include "db.php";
       cursor: pointer;
       margin-top: 25px;
     }
+    .submit-btn:hover { background: #072a45; }
 
-    .submit-btn:hover {
-      background: #072a45;
-    }
+    .hidden { display: none; }
 
-    .hidden {
-      display: none;
-    }
-
-    /* ✅ الفوتر */
+    /* ✅ Footer */
     footer {
+      background: #1f3b4d;
       text-align: center;
-      padding: 20px;
-      background: white;
-      margin-top: 40px;
-      font-size: 14px;
+      padding: 0.938em;
+      border-top: 0.188em solid #d9f0f3;
+      font-size: 0.875em;
+      color: #d6eaf8;
+      margin-top: auto;
+      width: 100%;
     }
 
   </style>
@@ -155,13 +145,12 @@ include "db.php";
 </head>
 <body>
 
-  <!-- ✅ الهيدر النهائي -->
+  <!-- ✅ Header -->
   <header>
     <div class="logo">
       <img src="images/logo.png" alt="LearnIT Logo">
       <h1>LearnIT</h1>
     </div>
-
     <nav>
       <a href="index.php">Home</a>
       <a href="login.php">Login</a>
@@ -169,24 +158,20 @@ include "db.php";
     </nav>
   </header>
 
-  <!-- ✅ المحتوى -->
+  <!-- ✅ Content -->
   <main class="card-container">
 
     <h2>Create Your Account</h2>
 
-    <!-- ✅ اختيار نوع المستخدم -->
-    <div class="box">
-      <fieldset>
-        <legend>User Type:</legend>
-        <label><input type="radio" name="userType" id="learnerRadio" value="learner" checked onclick="toggleForms()"> Learner</label>
-        <label><input type="radio" name="userType" id="educatorRadio" value="educator" onclick="toggleForms()"> Educator</label>
-      </fieldset>
-    </div>
+    <fieldset>
+      <legend>User Type:</legend>
+      <label><input type="radio" name="userType" id="learnerRadio" value="learner" checked onclick="toggleForms()"> Learner</label>
+      <label><input type="radio" name="userType" id="educatorRadio" value="educator" onclick="toggleForms()"> Educator</label>
+    </fieldset>
 
-    <!-- ✅ النموذج كامل -->
     <form action="signup_process.php" method="POST" enctype="multipart/form-data">
 
-      <!-- ✅ Learner -->
+      <!-- Learner -->
       <div id="learnerBox">
         <fieldset>
           <legend>Learner Form</legend>
@@ -208,7 +193,7 @@ include "db.php";
         </fieldset>
       </div>
 
-      <!-- ✅ Educator -->
+      <!-- Educator -->
       <div id="educatorBox" class="hidden">
         <fieldset>
           <legend>Educator Form</legend>
@@ -238,23 +223,16 @@ include "db.php";
         </fieldset>
       </div>
 
-      <!-- ✅ الزر الوحيد -->
       <button type="submit" class="submit-btn">Sign Up</button>
 
     </form>
 
   </main>
 
- <footer style="
-    background-color: #163a4d;
-    color: white;
-    text-align: center;
-    padding: 20px;
-    margin-top: 40px;
-    font-size: 14px;">
-    © 2025 learnIT. All rights reserved.
-</footer>
-
+  <!-- ✅ Footer -->
+  <footer>
+    <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
+  </footer>
 
 </body>
 </html>
