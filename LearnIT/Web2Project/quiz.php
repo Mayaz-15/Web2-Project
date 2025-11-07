@@ -12,8 +12,18 @@ if (!isset($_SESSION['id'])) {
 }
 
 // --- inputs ---
-$quizID = isset($_GET['quizID']) ? (int)$_GET['quizID'] : 1;
+// Support BOTH ?quizID= and ?quiz_id= so it works with educator.php
+$quizID = 0;
+if (isset($_GET['quizID'])) {
+    $quizID = (int)$_GET['quizID'];
+} elseif (isset($_GET['quiz_id'])) {
+    $quizID = (int)$_GET['quiz_id'];
+}
 
+// Safety: if nothing is passed, stop instead of silently using 1
+if ($quizID <= 0) {
+    die("No quiz selected. (Missing quizID in URL)");
+}
 // optional role guard (during dev you can keep it soft)
 if ($_SESSION['userType'] !== 'educator') {
   // header("Location: index.php"); exit;
