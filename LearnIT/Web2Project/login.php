@@ -1,7 +1,6 @@
 <?php
 session_start();
-require_once 'connect.php'; 
-
+require_once 'connect.php';
 
 if (isset($_SESSION['user_id'])) {
     if ($_SESSION['user_type'] === 'learner') { header('Location: learner.php'); exit; }
@@ -9,43 +8,44 @@ if (isset($_SESSION['user_id'])) {
 }
 
 $error = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
-    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
-$password = trim($_POST['password'] ?? '');
+    $email    = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+    $password = trim($_POST['password'] ?? '');
 
     if ($email === '' || $password === '') {
         $error = 'Please enter email and password.';
     } else {
         $sql = "SELECT id, firstName, lastName, emailAddress, password, photoFileName, userType
-                FROM user WHERE emailAddress = ?";
+                FROM `user` WHERE emailAddress = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $res = $stmt->get_result();
 
         if ($row = $res->fetch_assoc()) {
-            
-            if ($row['password'] === $password /* || password_verify($password, $row['password']) */) {
+            if (password_verify($password, $row['password'])) {
                 $_SESSION['user_id']    = (int)$row['id'];
-                $_SESSION['user_type']  = $row['userType'];   // 'learner' أو 'educator'
+                $_SESSION['user_type']  = $row['userType'];
                 $_SESSION['first_name'] = $row['firstName'];
                 $_SESSION['last_name']  = $row['lastName'];
                 $_SESSION['email']      = $row['emailAddress'];
                 $_SESSION['photo']      = $row['photoFileName'];
 
-                if ($row['userType'] === 'learner') { header('Location: learner.php'); exit; }
-                else                                { header('Location: educator.php'); exit; }
+                header('Location: ' . ($_SESSION['user_type'] === 'learner' ? 'learner.php' : 'educator.php'));
+                exit;
             } else {
                 $error = 'Incorrect email or password.';
             }
         } else {
             $error = 'Incorrect email or password.';
         }
+
         $stmt->close();
     }
 }
 ?>
+
 
 
 
@@ -186,7 +186,6 @@ margin: 40px 1%;
   <input type="email" name="email" placeholder="Email" required><br>
   <input type="password" name="password" placeholder="Password" required><br>
 
-  
   <button type="submit" class="btn">Log in</button>
 
   
