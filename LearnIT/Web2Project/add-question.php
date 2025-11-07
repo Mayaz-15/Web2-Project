@@ -11,8 +11,17 @@ if (!isset($_SESSION['id'])) {
   $_SESSION['userType'] = 'educator';
 }
 
-// quizID from GET or POST (default 1)
-$quizID = isset($_GET['quizID']) ? (int)$_GET['quizID'] : (int)($_POST['quizID'] ?? 1);
+// quizID from GET or POST
+$quizID = 0;
+if (isset($_GET['quizID'])) {
+    $quizID = (int)$_GET['quizID'];
+} elseif (isset($_POST['quizID'])) {
+    $quizID = (int)$_POST['quizID'];
+}
+
+if ($quizID <= 0) {
+    die("No quiz selected. Open this page from the quiz management page.");
+}
 
 // fetch topic name (header display)
 $topicName = "—";
