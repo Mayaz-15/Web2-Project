@@ -1,208 +1,245 @@
+<?php 
+require_once 'connect.php'; 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-   <link rel="stylesheet" href="style.css">
-  <title>Sign-Up</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - LearnIT</title>
+
   <style>
-   
-    h2 {
-      color: #1f3b4d;
-      margin-bottom: 1.25em;
-      text-align: center;
-      font-size: 2.5em;
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #eef5f9, #d9f0f3);
+      color: #2e3a45;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    .box {
-      max-width: 46.875em;
-      margin: 1.25em auto;
-      background: #fff;
+    header {
+      background: #1f3b4d;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.938em 2.5em;
+      border-bottom: 0.188em solid #d9f0f3;
+      color: #fff;
+    }
+    header .logo { display: flex; align-items: center; }
+    header .logo img { height: 2.812em; margin-right: 0.625em; }
+
+    header nav a {
+      margin: 0 0.938em;
+      text-decoration: none;
+      color: #eaf6fb;
+      font-weight: 500;
+    }
+
+    .card-container {
+      width: 70rem;
+      max-width: 90%;
+      margin: 3em auto;
+      padding: 2em;
+      background-color: #ffffff;
       border-radius: 0.5em;
-      box-shadow: 0 0.125em 0.375em rgba(0,0,0,0.05);
-      padding: 1.25em;
+      box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #1f3b4d;
+      font-size: 2.2rem;
+      margin-bottom: 1em;
     }
 
     fieldset {
-      border: 0.0625em solid #ddd;
-      padding: 1.25em;
-      border-radius: 0.5em;
-      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
     }
+
     legend {
       font-weight: bold;
       color: #1f3b4d;
+      padding: 0 8px;
     }
 
     label {
       display: block;
-      margin-top: 0.625em;
-      font-weight: 500;
-      font-size: 0.9375em;
+      margin-top: 12px;
       color: #1f3b4d;
+      font-size: 15px;
     }
+
     input[type="text"],
     input[type="email"],
     input[type="password"],
     input[type="file"] {
       width: 100%;
-      padding: 0.625em;
-      margin-top: 0.3125em;
-      border: 0.0625em solid #ccc;
-      border-radius: 0.375em;
-      font-size: 0.9375em;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 4px;
+      font-size: 15px;
     }
 
-    a.btn {
-      display: inline-block;
-      text-align: center;
-      font-size: 0.9375em;
-    }
-	
-
-    .btn-learners {
+    .submit-btn {
+      width: 100%;
+      padding: 15px;
       background: #0A3D62;
-      margin-right: 0.625em;
-    }
-    .btn-learners:hover { background: #082a45; }
-
-    .btn-educators {
-      background: #38B2AC;
-    }
-    .btn-educators:hover { background: #2f8e87; }
-
- 
-    .radio-group {
-      display: flex;
-      align-items: center;
-      gap: 1.25em;
-      margin: 0.9375em 0;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 25px;
     }
 
     .hidden { display: none; }
 
-    .form-box fieldset {
+    footer {
+      background: #1f3b4d;
+      text-align: center;
+      padding: 0.938em;
+      border-top: 0.188em solid #d9f0f3;
+      font-size: 0.875em;
+      color: #d6eaf8;
+      margin-top: auto;
       width: 100%;
-      max-width: 46.875em;
-      min-height: 32.5em;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      margin: auto;
-    }
-
-
-    .btn-group {
-      display: flex;
-      justify-content: center;
-      gap: 0.9375em;
-      margin-top: 1.25em;
-    }
-
-    @media (max-width: 600px) {
-      main { padding: 1.25em; }
-      .card-container { padding: 1em; }
-      header, footer { padding: 0.625em 1.25em; }
     }
   </style>
+
+<script>
+  function setGroupState(boxId, enable, requiredNames=[]) {
+    const box = document.getElementById(boxId);
+    box.style.display = enable ? "block" : "none";
+
+    // Toggle disabled & required on all controls in that box
+    box.querySelectorAll("input, select, textarea").forEach(el => {
+      el.disabled = !enable;
+      // Only mark required for the names you want required in that group
+      if (enable && requiredNames.includes(el.name)) {
+        el.setAttribute("required", "required");
+      } else {
+        el.removeAttribute("required");
+      }
+    });
+  }
+
+  function toggleForms() {
+    const userTypeHidden = document.getElementById("userTypeHidden");
+    const isLearner = document.getElementById("learnerRadio").checked;
+
+    userTypeHidden.value = isLearner ? "learner" : "educator";
+
+    // List which fields should be required in each group
+    const learnerRequired = ["firstName", "lastName", "email", "password"];
+    const educatorRequired = ["firstNameEdu", "lastNameEdu", "emailEdu", "passwordEdu"];
+
+    setGroupState("learnerBox",  isLearner, learnerRequired);
+    setGroupState("educatorBox", !isLearner, educatorRequired);
+  }
+
+  // Ensure correct state on load (in case Educator is preselected)
+  document.addEventListener("DOMContentLoaded", toggleForms);
+</script>
+
+
 </head>
 <body>
-  <header>
-    <div class="logo">
-       <img src="images/logo.png" alt="LearnIT Logo">
-      <h1>LearnIT</h1>
-    </div>
-    <nav>
-      <a href="index.php">Home</a>
-      <a href="login.php">Login</a>
-      <a href="signup.php">Sign Up</a>
-    </nav>
-  </header>
 
-  <main class="card-container">
-    <h2>Create Your Account</h2>
+<header>
+  <div class="logo">
+    <img src="images/logo.png" alt="LearnIT Logo">
+    <h1>LearnIT</h1>
+  </div>
+  <nav>
+    <a href="index.php">Home</a>
+    <a href="login.php">Login</a>
+    <a href="signup.php">Sign Up</a>
+  </nav>
+</header>
 
-    <div class="box">
-      <fieldset>
-        <legend>User Type:</legend>
-        <div class="radio-group">
-          <label>
-            <input type="radio" name="userType" value="learner" checked> Learner
-          </label>
-          <label>
-            <input type="radio" name="userType" value="educator"> Educator
-          </label>
-        </div>
-      </fieldset>
-    </div>
+<main class="card-container">
 
-    <form id="learnerForm" class="form-box">
+  <h2>Create Your Account</h2>
+
+  <fieldset>
+    <legend>User Type:</legend>
+    <label><input type="radio" name="ut" id="learnerRadio" value="learner" checked onclick="toggleForms()"> Learner</label>
+    <label><input type="radio" name="ut" id="educatorRadio" value="educator" onclick="toggleForms()"> Educator</label>
+  </fieldset>
+
+  <form action="signup_process.php" method="POST" enctype="multipart/form-data">
+
+    <!-- ✅ hidden input مهم جداً -->
+    <input type="hidden" id="userTypeHidden" name="userType" value="learner">
+
+    <!-- Learner -->
+    <div id="learnerBox">
       <fieldset>
         <legend>Learner Form</legend>
-        <label>First Name:</label>
-        <input type="text" placeholder=" Sara" required />
-        <label>Last Name:</label>
-        <input type="text" placeholder=" Al-Qahtani" required />
-        <label>Profile Image:</label>
-        <input type="file" id="learnerImage" accept="image/*" />
-        <label>Email:</label>
-        <input type="email" placeholder=" learner@example.com" required />
-        <label>Password:</label>
-        <input type="password" placeholder=" StrongPass123" required />
-        <div class="btn-group">
-          <a href="learner.php" class="btn btn-learners">Sign Up Learner’s Homepage</a>
-          <a href="educator.php" class="btn btn-educators">Sign Up Educator’s Homepage</a>
-        </div>
-      </fieldset>
-    </form>
 
-    <form id="educatorForm" class="hidden form-box">
+        <label>First Name:</label>
+        <input type="text" name="firstName" required>
+
+        <label>Last Name:</label>
+        <input type="text" name="lastName" required>
+
+        <label>Profile Image (optional):</label>
+        <input type="file" name="photo" accept="image/*">
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <label>Password:</label>
+        <input type="password" name="password" required>
+      </fieldset>
+    </div>
+
+    <!-- Educator -->
+    <div id="educatorBox" class="hidden" aria-hidden="true">
       <fieldset>
         <legend>Educator Form</legend>
+
         <label>First Name:</label>
-        <input type="text" placeholder=" Ghala" required />
+        <input type="text" name="firstNameEdu" required="">
+
         <label>Last Name:</label>
-        <input type="text" placeholder=" Al-Otaibi" required />
-        <label>Profile Image:</label>
-        <input type="file" id="educatorImage" accept="image/*" />
+        <input type="text" name="lastNameEdu" required="">
+
+        <label>Profile Image (optional):</label>
+        <input type="file" name="photo" accept="image/*">
+
         <label>Email:</label>
-        <input type="email" placeholder=" educator@example.com" required />
+        <input type="email" name="emailEdu" required="">
+
         <label>Password:</label>
-        <input type="password" placeholder=" EduPass2025" required />
+        <input type="password" name="passwordEdu" required="">
+
         <label>Specialized Topics:</label>
-        <div>
-          <input type="checkbox" name="topics" value="AI"> AI<br>
-          <input type="checkbox" name="topics" value="IoT"> IoT<br>
-          <input type="checkbox" name="topics" value="Cybersecurity"> Cybersecurity<br>
-        </div>
-        <div class="btn-group">
-          <a href="learner.php" class="btn btn-learners">Sign Up Learner’s Homepage</a>
-          <a href="educator.php" class="btn btn-educators">Sign Up Educator’s Homepage</a>
-        </div> 
+        <?php
+          $res = $conn->query("SELECT id, topicName FROM topic");
+          while ($row = $res->fetch_assoc()) {
+            echo '<label><input type="checkbox" name="topics[]" value="'.$row['id'].'"> '.$row['topicName'].'</label>';
+          }
+        ?>
       </fieldset>
-    </form>
-  </main>
+    </div>
 
-  <footer>
-    &copy; 2025 learnIT. All rights reserved.
-  </footer>
+    <button type="submit" class="submit-btn">Sign Up</button>
 
-  <script>
-    const learnerForm = document.getElementById("learnerForm");
-    const educatorForm = document.getElementById("educatorForm");
-    const radios = document.querySelectorAll('input[name="userType"]');
+  </form>
 
-    radios.forEach(radio => {
-      radio.addEventListener("change", () => {
-        if (radio.value === "learner") {
-          learnerForm.classList.remove("hidden");
-          educatorForm.classList.add("hidden");
-        } else {
-          educatorForm.classList.remove("hidden");
-          learnerForm.classList.add("hidden");
-        }
-      });
-    });
-  </script>
+</main>
+
+<footer>
+  <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
+</footer>
+
 </body>
 </html>
