@@ -1,112 +1,95 @@
 <?php
 session_start();
-include "db.php";   // الاتصال بقاعدة البيانات
+require_once 'connect.php'; // الاتصال بقاعدة البيانات (MySQLi)
 
-
-// =======================================================
-// (1) تحديد نوع المستخدم (Learner OR Educator)
-// =======================================================
-$userType = $_POST['userType'];
-
-if ($userType === "learner") {
-
-    $first = $_POST['firstName'];
-    $last  = $_POST['lastName'];
-    $email = $_POST['email'];
-    $pass  = $_POST['password'];
-
-} else {
-
-    $first = $_POST['firstNameEdu'];
-    $last  = $_POST['lastNameEdu'];
-    $email = $_POST['emailEdu'];
-    $pass  = $_POST['passwordEdu'];
-}
-
-
-// =======================================================
-// (2) معالجة الصورة (اختيارية) + صورة افتراضية
-// =======================================================
-$photoFile = "default_profile.png";  // الصورة الافتراضية
-
-if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
-
-    // اسم فريد
-    $uniqueName = time() . "_" . $_FILES['photo']['name'];
-
-    // رفع الملف
-    move_uploaded_file($_FILES['photo']['tmp_name'], "uploads/" . $uniqueName);
-
-    // حفظ اسم الصورة
-    $photoFile = $uniqueName;
-}
-
-
-// =======================================================
-// (3) التحقق من الإيميل مكرر أم لا
-// =======================================================
-$stmt = $pdo->prepare("SELECT * FROM user WHERE emailAddress=?");
-$stmt->execute([$email]);
-
-if ($stmt->rowCount() > 0) {
-    header("Location: signup.php?error=email_exists");
+// تأكد أن الطلب من نوع POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: signup.php');
     exit;
 }
 
+// (1) تحديد نوع المستخدم (Learner OR Educator)
+$userType = $_POST['userType'] ?? 'learner';
 
-// =======================================================
-// (4) تشفير كلمة المرور
-// =======================================================
-$hashedPass = password_hash($pass, PASSWORD_DEFAULT);
+if ($userType === 'learner') {
+    $first = trim($_POST['firstName'] ?? '');
+    $last = trim($_POST['lastName'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $pass = trim($_POST['password'] ?? '');
+    $topics = []; // learner ما يختار توبكس
+} else {
+    $first = trim($_POST['firstNameEdu'] ?? '');
+    $last = trim($_POST['lastNameEdu'] ?? '');
+    $email = trim($_POST['emailEdu'] ?? '');
+    $pass = trim($_POST['passwordEdu'] ?? '');
+    $topics = isset($_POST['topics']) ? $_POST['topics'] : [];
+}
 
+// تحقق من القيم
+if ($first === ''||$email === '' || $pass === '') {
+    header('Location: signup.php?error=missing_fields');
+    exit;
+}
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    header('Location: signup.php?error=invalid_email');
+    exit;
+}
 
-// =======================================================
-// (5) إضافة المستخدم في جدول User
-// =======================================================
-$stmt = $pdo->prepare("
-    INSERT INTO user (firstName, lastName, emailAddress, password, photoFileName, userType)
-    VALUES (?, ?, ?, ?, ?, ?)
-");
-
-$stmt->execute([$first, $last, $email, $hashedPass, $photoFile, $userType]);
-
-// آخر ID تم تسجيله
-$newUserID = $pdo->lastInsertId();
-
-
-// =======================================================
-// (6) تخزين معلومات المستخدم في الـ SESSION
-// =======================================================
-$_SESSION['userID'] = $newUserID;
-$_SESSION['userType'] = $userType;
-
-
-// =======================================================
-// (7) إذا كان Educator → إنشاء quiz لكل topic مختار
-// =======================================================
-if ($userType === "educator" && isset($_POST['topics'])) {
-    
-    foreach ($_POST['topics'] as $topicID) {
-
-        $stmt = $pdo->prepare("
-            INSERT INTO quiz (educatorID, topicID)
-            VALUES (?, ?)
-        ");
-
-        $stmt->execute([$newUserID, $topicID]);
+// (2) معالجة الصورة (افتراضية أو مرفوعة)
+$photoFile = 'default_profile.png';
+if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
+    $uniqueName = time() . "_" . basename($_FILES['photo']['name']);
+    $targetDir = 'uploads/';
+    if (!is_dir($targetDir)) {
+        mkdir($targetDir, 0775, true);
+    }
+    $targetFile = $targetDir . $uniqueName;
+    if (move_uploaded_file($_FILES['photo']['tmp_name'], $targetFile)) {
+        $photoFile = $uniqueName;
     }
 }
 
+// (3) التحقق من الإيميل (هل موجود مسبقاً؟)
+$check = $conn->prepare("SELECT id FROM user WHERE emailAddress = ?");
+$check->bind_param("s", $email);
+$check->execute();
+$result = $check->get_result();
+if ($result->num_rows > 0) {
+    header("Location: signup.php?error=email_exists");
+    exit;
+}
+$check->close();
 
-// =======================================================
-// (8) إعادة التوجيه للصفحة المناسبة
-// =======================================================
-if ($userType === "learner") {
+// (4) تشفير كلمة المرور
+$hashedPass = password_hash($pass, PASSWORD_DEFAULT);
+
+// (5) إدخال المستخدم الجديد
+$insert = $conn->prepare("INSERT INTO user (firstName, lastName, emailAddress, password, photoFileName, userType)
+                          VALUES (?, ?, ?, ?, ?, ?)");
+$insert->bind_param("ssssss", $first, $last, $email, $hashedPass, $photoFile, $userType);
+$insert->execute();
+$newUserID = $insert->insert_id;
+$insert->close();
+
+// (6) تخزين معلومات المستخدم في السيشن
+$_SESSION['user_id'] = $newUserID;
+$_SESSION['user_type'] = $userType;
+
+// (7) إذا كان Educator أنشئ Quiz لكل Topic
+if ($userType === 'educator' && !empty($topics)) {
+    $quizInsert = $conn->prepare("INSERT INTO quiz (educatorID, topicID) VALUES (?, ?)");
+    foreach ($topics as $topicID) {
+        $quizInsert->bind_param("ii", $newUserID, $topicID);
+        $quizInsert->execute();
+    }
+    $quizInsert->close();
+}
+
+// (8) التوجيه حسب نوع المستخدم
+if ($userType === 'learner') {
     header("Location: learner_homepage.php");
 } else {
     header("Location: educator_homepage.php");
 }
-
 exit;
-
 ?>
