@@ -148,12 +148,16 @@ $qres = mysqli_query($conn, "
     <div class="card-container">
       <section class="q-panel">
         <h2><?php echo htmlspecialchars($topicName); ?> — Quiz #<?php echo (int)$quizID; ?></h2>
+<div class="q-inline" style="margin-bottom:1rem;">
+  <a class="btn submit" href="add-question.php?quizID=<?php echo (int)$quizID; ?>">
+    + Add Question
+  </a>
 
-        <!-- top actions: now using your button styles -->
-        <div class="q-inline" style="margin-bottom:1rem;">
-          <a class="btn submit" href="add-question.php?quizID=<?php echo (int)$quizID; ?>">+ Add Question</a>
-          <a class="takeHome" href="take-quiz.php?quizID=<?php echo (int)$quizID; ?>">Preview / Take Quiz</a>
-        </div>
+  <!-- Back to Educator Home instead of Preview / Take Quiz -->
+  <a class="takeHome" href="educator.php">
+    ← Back to Dashboard
+  </a>
+</div>
 
         <!-- Q -->
         <?php if ($qres && mysqli_num_rows($qres)): ?>
