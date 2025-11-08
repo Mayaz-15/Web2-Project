@@ -100,10 +100,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['answer']) && is_arra
         $ins->close();
     }
 } else {
-    // No posted answers — possible user navigated here without submitting; keep defaults
-    // Optionally, you could redirect back to take-quiz.php
-    // header("Location: take-quiz.php?quizID={$quiz_id}");
-    // exit();
+    // No posted answers — possible user navigated here without submitting
+    header("Location: take-quiz.php?quizID={$quiz_id}");
+    exit();
 }
 
 // --- Decide reaction video/messages (adjust files to match your uploads folder) ---
@@ -146,7 +145,7 @@ if ($scorePercent >= 90) {
       <h1>LEARNIT</h1>
     </div>
     <nav>
-      <a href="learner.php">Back to Learner Home</a>
+      <a href="learner.php">Home</a>
     </nav>
   </header>
 
