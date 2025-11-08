@@ -258,7 +258,7 @@ $recs = fetch_all(
      </header>
 
      <main class="card-container">
-        <div class="Logout"><a href="logout.php">Log-out</a></div>
+        <div class="Logout"><a href="index.php">Log-out</a></div>
         <h2 class="EducatorH2">Educator</h2>
 
         <div class="dashboardF">
