@@ -1,5 +1,5 @@
 <?php 
-include "db.php"; 
+require_once 'connect.php'; // الاتصال بقاعدة البيانات (MySQLi)
 ?>
 <!DOCTYPE html>
 <html lang="en">
