@@ -1,5 +1,5 @@
 <?php 
-require_once 'connect.php'; // الاتصال بقاعدة البيانات (MySQLi)
+require_once 'connect.php'; 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -8,10 +8,7 @@ require_once 'connect.php'; // الاتصال بقاعدة البيانات (MyS
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign Up - LearnIT</title>
 
-  <!-- ✅ CSS داخلي كامل -->
   <style>
-
-    /* خلفية الصفحة */
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,10 +17,8 @@ require_once 'connect.php'; // الاتصال بقاعدة البيانات (MyS
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      line-height: 1.6;
     }
 
-    /* ✅ Header */
     header {
       background: #1f3b4d;
       display: flex;
@@ -33,21 +28,16 @@ require_once 'connect.php'; // الاتصال بقاعدة البيانات (MyS
       border-bottom: 0.188em solid #d9f0f3;
       color: #fff;
     }
-
     header .logo { display: flex; align-items: center; }
     header .logo img { height: 2.812em; margin-right: 0.625em; }
-    header .logo h1 { font-size: 1.375em; letter-spacing: 0.062em; }
 
     header nav a {
       margin: 0 0.938em;
       text-decoration: none;
       color: #eaf6fb;
       font-weight: 500;
-      transition: color 0.3s;
     }
-    header nav a:hover { color: #aed6f1; }
 
-    /* ✅ White Card */
     .card-container {
       width: 70rem;
       max-width: 90%;
@@ -97,7 +87,6 @@ require_once 'connect.php'; // الاتصال بقاعدة البيانات (MyS
       font-size: 15px;
     }
 
-    /* ✅ Submit Button */
     .submit-btn {
       width: 100%;
       padding: 15px;
@@ -109,11 +98,9 @@ require_once 'connect.php'; // الاتصال بقاعدة البيانات (MyS
       cursor: pointer;
       margin-top: 25px;
     }
-    .submit-btn:hover { background: #072a45; }
 
     .hidden { display: none; }
 
-    /* ✅ Footer */
     footer {
       background: #1f3b4d;
       text-align: center;
@@ -124,119 +111,117 @@ require_once 'connect.php'; // الاتصال بقاعدة البيانات (MyS
       margin-top: auto;
       width: 100%;
     }
-
   </style>
 
-  <script>
-    function toggleForms() {
-      let learnerBox = document.getElementById("learnerBox");
-      let educatorBox = document.getElementById("educatorBox");
+<script>
+  function toggleForms() {
+    let learnerBox = document.getElementById("learnerBox");
+    let educatorBox = document.getElementById("educatorBox");
+    let userTypeHidden = document.getElementById("userTypeHidden");
 
-      if (document.getElementById("learnerRadio").checked) {
-        learnerBox.style.display = "block";
-        educatorBox.style.display = "none";
-      } else {
-        learnerBox.style.display = "none";
-        educatorBox.style.display = "block";
-      }
+    if (document.getElementById("learnerRadio").checked) {
+      learnerBox.style.display = "block";
+      educatorBox.style.display = "none";
+      userTypeHidden.value = "learner"; 
+    } else {
+      learnerBox.style.display = "none";
+      educatorBox.style.display = "block";
+      userTypeHidden.value = "educator"; 
     }
-  </script>
+  }
+</script>
 
 </head>
 <body>
 
-  <!-- ✅ Header -->
-  <header>
-    <div class="logo">
-      <img src="images/logo.png" alt="LearnIT Logo">
-      <h1>LearnIT</h1>
+<header>
+  <div class="logo">
+    <img src="images/logo.png" alt="LearnIT Logo">
+    <h1>LearnIT</h1>
+  </div>
+  <nav>
+    <a href="index.php">Home</a>
+    <a href="login.php">Login</a>
+    <a href="signup.php">Sign Up</a>
+  </nav>
+</header>
+
+<main class="card-container">
+
+  <h2>Create Your Account</h2>
+
+  <fieldset>
+    <legend>User Type:</legend>
+    <label><input type="radio" name="ut" id="learnerRadio" value="learner" checked onclick="toggleForms()"> Learner</label>
+    <label><input type="radio" name="ut" id="educatorRadio" value="educator" onclick="toggleForms()"> Educator</label>
+  </fieldset>
+
+  <form action="signup_process.php" method="POST" enctype="multipart/form-data">
+
+    <!-- ✅ hidden input مهم جداً -->
+    <input type="hidden" id="userTypeHidden" name="userType" value="learner">
+
+    <!-- Learner -->
+    <div id="learnerBox">
+      <fieldset>
+        <legend>Learner Form</legend>
+
+        <label>First Name:</label>
+        <input type="text" name="firstName" required>
+
+        <label>Last Name:</label>
+        <input type="text" name="lastName" required>
+
+        <label>Profile Image (optional):</label>
+        <input type="file" name="photo" accept="image/*">
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <label>Password:</label>
+        <input type="password" name="password" required>
+      </fieldset>
     </div>
-    <nav>
-      <a href="index.php">Home</a>
-      <a href="login.php">Login</a>
-      <a href="signup.php">Sign Up</a>
-    </nav>
-  </header>
 
-  <!-- ✅ Content -->
-  <main class="card-container">
+    <!-- Educator -->
+    <div id="educatorBox" class="hidden">
+      <fieldset>
+        <legend>Educator Form</legend>
 
-    <h2>Create Your Account</h2>
+        <label>First Name:</label>
+        <input type="text" name="firstNameEdu">
 
-    <fieldset>
-      <legend>User Type:</legend>
-      <label><input type="radio" name="userType" id="learnerRadio" value="learner" checked onclick="toggleForms()"> Learner</label>
-      <label><input type="radio" name="userType" id="educatorRadio" value="educator" onclick="toggleForms()"> Educator</label>
-    </fieldset>
+        <label>Last Name:</label>
+        <input type="text" name="lastNameEdu">
 
-    <form action="signup_process.php" method="POST" enctype="multipart/form-data">
+        <label>Profile Image (optional):</label>
+        <input type="file" name="photo" accept="image/*">
 
-      <!-- Learner -->
-      <div id="learnerBox">
-        <fieldset>
-          <legend>Learner Form</legend>
+        <label>Email:</label>
+        <input type="email" name="emailEdu">
 
-          <label>First Name:</label>
-          <input type="text" name="firstName" required>
+        <label>Password:</label>
+        <input type="password" name="passwordEdu">
 
-          <label>Last Name:</label>
-          <input type="text" name="lastName" required>
+        <label>Specialized Topics:</label>
+        <?php
+          $res = $conn->query("SELECT id, topicName FROM topic");
+          while ($row = $res->fetch_assoc()) {
+            echo '<label><input type="checkbox" name="topics[]" value="'.$row['id'].'"> '.$row['topicName'].'</label>';
+          }
+        ?>
+      </fieldset>
+    </div>
 
-          <label>Profile Image (optional):</label>
-          <input type="file" name="photo" accept="image/*">
+    <button type="submit" class="submit-btn">Sign Up</button>
 
-          <label>Email:</label>
-          <input type="email" name="email" required>
+  </form>
 
-          <label>Password:</label>
-          <input type="password" name="password" required>
-        </fieldset>
-      </div>
+</main>
 
-      <!-- Educator -->
-      <div id="educatorBox" class="hidden">
-        <fieldset>
-          <legend>Educator Form</legend>
-
-          <label>First Name:</label>
-          <input type="text" name="firstNameEdu">
-
-          <label>Last Name:</label>
-          <input type="text" name="lastNameEdu">
-
-          <label>Profile Image (optional):</label>
-          <input type="file" name="photo" accept="image/*">
-
-          <label>Email:</label>
-          <input type="email" name="emailEdu">
-
-          <label>Password:</label>
-          <input type="password" name="passwordEdu">
-
-          <label>Specialized Topics:</label>
-          <?php
-$res = $conn->query("SELECT id, topicName FROM topic");
-if ($res) {
-  while ($row = $res->fetch_assoc()) {
-    echo '<label><input type="checkbox" name="topics[]" value="'.$row['id'].'"> '.$row['topicName'].'</label>';
-  }
-  $res->free();
-}
-?>
-
-        </fieldset>
-      </div>
-
-      <button type="submit" class="submit-btn">Sign Up</button>
-
-    </form>
-
-  </main>
-
-  <!-- ✅ Footer -->
-  <footer>
-    <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
-  </footer>
+<footer>
+  <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
+</footer>
 
 </body>
 </html>
