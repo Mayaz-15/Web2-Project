@@ -133,7 +133,7 @@ $recRes = mysqli_stmt_get_result($stmt2);
 </header>
 
 <main class="card-container">
-  <div style="text-align:right;"><a href="index.php" class="filter">Log-out</a></div>
+  <div style="text-align:right;"><a href="logout.php" class="filter">Log-out</a></div>
   <h2 class="learnerh2">Learner</h2>
 
   <div class="dashboardF" style="display:flex; gap:2rem;">
