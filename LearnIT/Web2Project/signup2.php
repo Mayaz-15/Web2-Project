@@ -215,11 +215,15 @@ require_once 'connect.php'; // الاتصال بقاعدة البيانات (MyS
 
           <label>Specialized Topics:</label>
           <?php
-            $stmt = $pdo->query("SELECT * FROM topic");
-            while ($row = $stmt->fetch()) {
-              echo '<label><input type="checkbox" name="topics[]" value="'.$row["id"].'"> '.$row["topicName"].'</label>';
-            }
-          ?>
+$res = $conn->query("SELECT id, topicName FROM topic");
+if ($res) {
+  while ($row = $res->fetch_assoc()) {
+    echo '<label><input type="checkbox" name="topics[]" value="'.$row['id'].'"> '.$row['topicName'].'</label>';
+  }
+  $res->free();
+}
+?>
+
         </fieldset>
       </div>
 
