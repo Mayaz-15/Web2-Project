@@ -5,11 +5,25 @@ include 'connect.php'; // should define $conn
 if (!$conn) { die("Connection failed: " . mysqli_connect_error()); }
 
 // --- Session check---
-if (!isset($_SESSION['id']) || !isset($_SESSION['userType']) || $_SESSION['userType'] !== 'learner') {
-    header("Location: index.php");
-    exit();
+// 🔁 Map login.php session keys to the ones this page expects
+if (isset($_SESSION['user_id']) && !isset($_SESSION['id'])) {
+    $_SESSION['id'] = $_SESSION['user_id'];
 }
-$learnerID = (int) $_SESSION['id'];
+if (isset($_SESSION['user_type']) && !isset($_SESSION['userType'])) {
+    $_SESSION['userType'] = $_SESSION['user_type'];
+}
+
+// ✅ Check if user is logged in
+if (!isset($_SESSION['id']) || !isset($_SESSION['userType'])) {
+    header("Location: index.php?error=unauthorized");
+    exit;
+}
+
+// ✅ Check if the user is an learner
+if ($_SESSION['userType'] !== 'learner') {
+    header("Location: index.php?error=unauthorized");
+    exit;
+}
 
 // --- Fetch topics ---
 $topics = [];
