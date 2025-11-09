@@ -1,14 +1,28 @@
 <?php
 // --- DB + session (match your local creds) ---
-$conn = mysqli_connect("localhost", "root", "root", "dblearnit");
-if (!$conn) { die("Connection failed: " . mysqli_connect_error()); }
-mysqli_set_charset($conn, "utf8mb4");
+require_once 'connect.php';
 
 session_start();
-// Dev stub (remove when real login exists)
-if (!isset($_SESSION['id'])) {
-  $_SESSION['id'] = 2;             // a learner id from your seed data
-  $_SESSION['userType'] = 'learner';
+
+
+// 🔁 Map login.php session keys to the ones this page expects
+if (isset($_SESSION['user_id']) && !isset($_SESSION['id'])) {
+    $_SESSION['id'] = $_SESSION['user_id'];
+}
+if (isset($_SESSION['user_type']) && !isset($_SESSION['userType'])) {
+    $_SESSION['userType'] = $_SESSION['user_type'];
+}
+
+// ✅ Check if user is logged in
+if (!isset($_SESSION['id']) || !isset($_SESSION['userType'])) {
+    header("Location: index.php?error=unauthorized");
+    exit;
+}
+
+// ✅ Check if the user is an learner
+if ($_SESSION['userType'] !== 'learner') {
+    header("Location: index.php?error=unauthorized");
+    exit;
 }
 
 // inputs
@@ -106,7 +120,7 @@ if ($qres) {
       <h1>LEARNIT</h1>
     </div>
     <nav>
-      <a href="learner.php">Back to Learner Home</a>
+      <a href="learner.php">Home</a>
     </nav>
   </header>
 
@@ -122,7 +136,7 @@ if ($qres) {
             <strong>Educator:</strong> <?php echo htmlspecialchars($meta['educatorName']); ?>
           </div>
           <div class="q-inline">
-            <a class="takeHome" href="learner.php">Back to Learner Home</a>
+            <a class="takeHome" href="learner.php">Back to Dashboard</a>
           </div>
         </div>
 
