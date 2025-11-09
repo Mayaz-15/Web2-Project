@@ -1,12 +1,8 @@
 <?php
-
 session_start();
+include 'connect.php'; // should create $conn (mysqli)
 
-
-    include 'connect.php'; // should create $conn (mysqli)
-
-    if (!$conn) { die("Connection failed: " . mysqli_connect_error()); }
- 
+if (!$conn) { die("Connection failed: " . mysqli_connect_error()); }
 
 // --- Session check---
 if (!isset($_SESSION['id']) || !isset($_SESSION['userType']) || $_SESSION['userType'] !== 'learner') {
@@ -21,25 +17,7 @@ if (!empty($_POST['quizID'])) $quiz_id = (int) $_POST['quizID'];
 elseif (!empty($_GET['quizID'])) $quiz_id = (int) $_GET['quizID'];
 
 if ($quiz_id <= 0) {
-    // If feedback submission posts quizID as hidden, that will also be processed below.
-    // If no quizID, can't proceed.
     die("Quiz ID missing. Make sure the take-quiz form posts quizID.");
-}
-
-// --- If this is feedback submission (rating + comments), handle and redirect immediately ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rating']) && isset($_POST['comments']) && !isset($_POST['answer'])) {
-    $rating = intval($_POST['rating']);
-    $comments = trim($_POST['comments']);
-
-    // Insert feedback
-    $stmt = $conn->prepare("INSERT INTO quizfeedback (quizID, rating, comments) VALUES (?, ?, ?)");
-    if ($stmt) {
-        $stmt->bind_param("iis", $quiz_id, $rating, $comments);
-        $stmt->execute();
-        $stmt->close();
-    }
-    header("Location: learner.php");
-    exit();
 }
 
 // --- Fetch quiz meta (topic + educator) using your DB schema ---
@@ -62,19 +40,17 @@ if (!$quiz) {
     die("Quiz not found.");
 }
 
-// --- Grade quiz only if answers are present (take-quiz posts answer[...] array) ---
+// --- Grade quiz only if answers are present ---
 $scorePercent = 0.00;
 $totalQuestions = 0;
 $correctAnswers = 0;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['answer']) && is_array($_POST['answer'])) {
-    // expected shape: $_POST['answer'][<questionId>] => 'A'|'B'|'C'|'D'
     foreach ($_POST['answer'] as $qid => $selected) {
         $qid = (int)$qid;
         $selectedOpt = strtoupper(trim($selected));
         if ($qid <= 0) continue;
 
-        // Ensure this question belongs to the quiz (protect against tampering)
         if ($q_stmt = $conn->prepare("SELECT correctAnswer FROM quizquestion WHERE id = ? AND quizID = ? LIMIT 1")) {
             $q_stmt->bind_param("ii", $qid, $quiz_id);
             $q_stmt->execute();
@@ -93,19 +69,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['answer']) && is_arra
         $scorePercent = 0.00;
     }
 
-    // Save result in takenquiz (schema: id, quizID, score)
     if ($ins = $conn->prepare("INSERT INTO takenquiz (quizID, score) VALUES (?, ?)")) {
         $ins->bind_param("id", $quiz_id, $scorePercent);
         $ins->execute();
         $ins->close();
     }
 } else {
-    // No posted answers — possible user navigated here without submitting
     header("Location: take-quiz.php?quizID={$quiz_id}");
     exit();
 }
 
-// --- Decide reaction video/messages (adjust files to match your uploads folder) ---
+// --- Decide reaction video/messages ---
 if ($scorePercent >= 90) {
     $video = "images/cheer.mp4";
     $message = "Excellent! You scored {$scorePercent}%!";
@@ -164,8 +138,7 @@ if ($scorePercent >= 90) {
         Sorry, your browser doesn't support embedded videos.
       </video>
 
-      <!-- Feedback Form (posts rating + comments + hidden quizID) -->
-      <form action="quiz-result.php" method="POST">
+      <form action="submit-feedback.php" method="POST">
         <fieldset>
           <legend>Rate the Quiz!</legend>
           <input type="hidden" name="quizID" value="<?= (int)$quiz_id ?>">
