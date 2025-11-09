@@ -1,55 +1,3 @@
-<?php
-session_start();
-require_once 'connect.php';
-
-if (isset($_SESSION['user_id'])) {
-    if ($_SESSION['user_type'] === 'learner') { header('Location: learner.php'); exit; }
-    if ($_SESSION['user_type'] === 'educator') { header('Location: educator.php'); exit; }
-}
-
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email    = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
-    $password = trim($_POST['password'] ?? '');
-
-    if ($email === '' || $password === '') {
-        $error = 'Please enter email and password.';
-    } else {
-        $sql = "SELECT id, firstName, lastName, emailAddress, password, photoFileName, userType
-                FROM `user` WHERE emailAddress = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $res = $stmt->get_result();
-
-        if ($row = $res->fetch_assoc()) {
-            if (password_verify($password, $row['password'])) {
-                $_SESSION['user_id']    = (int)$row['id'];
-                $_SESSION['user_type']  = $row['userType'];
-                $_SESSION['first_name'] = $row['firstName'];
-                $_SESSION['last_name']  = $row['lastName'];
-                $_SESSION['email']      = $row['emailAddress'];
-                $_SESSION['photo']      = $row['photoFileName'];
-
-                header('Location: ' . ($_SESSION['user_type'] === 'learner' ? 'learner.php' : 'educator.php'));
-                exit;
-            } else {
-                $error = 'Incorrect email or password.';
-            }
-        } else {
-            $error = 'Incorrect email or password.';
-        }
-
-        $stmt->close();
-    }
-}
-?>
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -182,7 +130,7 @@ margin: 40px 1%;
       <h2>Login to LearnIT</h2>
       
       
-      <form method="post" action="login.php" autocomplete="off">
+      <form method="post" action="login_process.php" autocomplete="off">
   <input type="email" name="email" placeholder="Email" required><br>
   <input type="password" name="password" placeholder="Password" required><br>
 
@@ -190,9 +138,13 @@ margin: 40px 1%;
   <button type="submit" class="btn">Log in</button>
 
   
-  <?php if (!empty($error)): ?>
-    <p class="error-msg"><?= htmlspecialchars($error) ?></p>
-  <?php endif; ?>
+  <?php if (!empty($_GET['error'])): ?>
+  <p class="error-msg">
+    <?= htmlspecialchars($_GET['error']) ?>
+  </p>
+<?php endif; ?>
+    
+    
 </form>
       
       
