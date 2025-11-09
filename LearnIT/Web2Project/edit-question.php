@@ -1,21 +1,34 @@
 <?php
 // --- DB + session (your local creds) ---
-$conn = mysqli_connect("localhost", "root", "root", "dblearnit");
-if (!$conn) { die("Connection failed: " . mysqli_connect_error()); }
-mysqli_set_charset($conn, "utf8mb4");
+require_once 'connect.php';
 
 session_start();
-// Dev stub (remove when real login exists)
-if (!isset($_SESSION['id'])) {
-  $_SESSION['id'] = 1;
-  $_SESSION['userType'] = 'educator';
+
+// 🔁 Map login.php session keys to the ones this page expects
+if (isset($_SESSION['user_id']) && !isset($_SESSION['id'])) {
+    $_SESSION['id'] = $_SESSION['user_id'];
+}
+if (isset($_SESSION['user_type']) && !isset($_SESSION['userType'])) {
+    $_SESSION['userType'] = $_SESSION['user_type'];
+}
+
+// ✅ Check if user is logged in
+if (!isset($_SESSION['id']) || !isset($_SESSION['userType'])) {
+    header("Location: index.php?error=unauthorized");
+    exit;
+}
+
+// ✅ Check if the user is an educator
+if ($_SESSION['userType'] !== 'educator') {
+    header("Location: index.php?error=unauthorized");
+    exit;
 }
 
 // --- Inputs ---
 $qid = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($qid <= 0) { die("Missing or invalid question id."); }
 
-// --- Load question + quiz + topic for GET and sticky POST ---
+// --- Load question + quiz + topic ---
 $sql = "SELECT qq.id, qq.quizID, qq.question, qq.questionFigureFileName,
                qq.answerA, qq.answerB, qq.answerC, qq.answerD, qq.correctAnswer,
                t.topicName
@@ -34,75 +47,6 @@ $quizID     = (int)$row['quizID'];
 $topicName  = $row['topicName'];
 $oldImgName = $row['questionFigureFileName'];
 
-// For sticky fields (prefill with DB values by default)
-$old = [
-  'qtext'   => $_POST['qtext'] ?? $row['question'],
-  'c1'      => $_POST['c1'] ?? $row['answerA'],
-  'c2'      => $_POST['c2'] ?? $row['answerB'],
-  'c3'      => $_POST['c3'] ?? $row['answerC'],
-  'c4'      => $_POST['c4'] ?? $row['answerD'],
-  'correct' => $_POST['correct'] ?? $row['correctAnswer'],
-];
-$errors = [];
-
-// --- Handle POST: update fields, optionally replace image ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  if (trim($old['qtext']) === '') $errors[] = "Question text is required.";
-  if (trim($old['c1'])   === '') $errors[] = "Choice A is required.";
-  if (trim($old['c2'])   === '') $errors[] = "Choice B is required.";
-  if (trim($old['c3'])   === '') $errors[] = "Choice C is required.";
-  if (trim($old['c4'])   === '') $errors[] = "Choice D is required.";
-  if (!in_array($old['correct'], ['A','B','C','D'], true)) $errors[] = "Choose a correct answer (A–D).";
-
-  $newImgName = $oldImgName; // default: keep current image
-
-  // If a new image is uploaded, validate & replace
-  if (!empty($_FILES['qfigure']['name'])) {
-    $allowed = ['png','jpg','jpeg','gif','webp'];
-    $ext = strtolower(pathinfo($_FILES['qfigure']['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, $allowed, true)) {
-      $errors[] = "Invalid image type. Allowed: " . implode(', ', $allowed);
-    }
-    if ($_FILES['qfigure']['error'] !== UPLOAD_ERR_OK) {
-      $errors[] = "Image upload error (code ".$_FILES['qfigure']['error'].").";
-    }
-    if ($_FILES['qfigure']['size'] > 3 * 1024 * 1024) {
-      $errors[] = "Image too large (max 3MB).";
-    }
-
-    if (!$errors) {
-      $uploadDir = __DIR__ . "/uploads";
-      if (!is_dir($uploadDir)) { @mkdir($uploadDir, 0775, true); }
-
-      $newImgName = "q{$quizID}-" . time() . "." . $ext;
-      $dest = $uploadDir . "/" . $newImgName;
-      if (!move_uploaded_file($_FILES['qfigure']['tmp_name'], $dest)) {
-        $errors[] = "Failed to move uploaded file.";
-      } else {
-        // delete old file if existed
-        if (!empty($oldImgName)) {
-          $oldPath = $uploadDir . "/" . $oldImgName;
-          if (is_file($oldPath)) { @unlink($oldPath); }
-        }
-      }
-    }
-  }
-
-  if (!$errors) {
-    $upd = "UPDATE quizquestion
-            SET question=?, questionFigureFileName=?, answerA=?, answerB=?, answerC=?, answerD=?, correctAnswer=?
-            WHERE id=?";
-    $ust = mysqli_prepare($conn, $upd);
-    mysqli_stmt_bind_param(
-      $ust, "sssssssi",
-      $old['qtext'], $newImgName, $old['c1'], $old['c2'], $old['c3'], $old['c4'], $old['correct'], $qid
-    );
-    mysqli_stmt_execute($ust);
-
-    header("Location: quiz.php?quizID=".$quizID);
-    exit;
-  }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -168,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h1>LEARNIT</h1>
     </div>
     <nav>
-      <a href="quiz.php?quizID=<?php echo (int)$quizID; ?>">Back to Quiz</a>
+      <a href="educator.php">Home</a>
     </nav>
   </header>
 
@@ -181,22 +125,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <a class="takeHome" href="quiz.php?quizID=<?php echo (int)$quizID; ?>">Back to Quiz</a>
         </div>
 
-        <?php if ($errors): ?>
+        <?php if (isset($_GET['error'])): ?>
           <div style="background:#ffecec;border:1px solid #ffb3b3;color:#b30000;padding:0.75rem;border-radius:0.5rem;margin-bottom:1rem;">
-            <strong>Please fix the following:</strong>
-            <ul style="margin-left:1.25rem;">
-              <?php foreach ($errors as $e): ?><li><?php echo htmlspecialchars($e); ?></li><?php endforeach; ?>
-            </ul>
+            <?php echo htmlspecialchars($_GET['error']); ?>
           </div>
         <?php endif; ?>
 
-        <form class="flex-container" action="edit-question.php?id=<?php echo (int)$qid; ?>" method="post" enctype="multipart/form-data">
+        <form class="flex-container" action="edit-question-process.php" method="post" enctype="multipart/form-data">
+          <!-- Hidden IDs -->
           <input type="hidden" name="qid" value="<?php echo (int)$qid; ?>" />
+          <input type="hidden" name="quizID" value="<?php echo (int)$quizID; ?>" />
 
           <fieldset>
             <legend>Question Details</legend>
 
-            <!-- Topic is derived from quiz; don’t let it drift -->
+            <!-- Topic is derived from quiz -->
             <div class="q-row">
               <label>Topic</label>
               <input type="text" value="<?php echo htmlspecialchars($topicName); ?>" readonly
@@ -205,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="q-row">
               <label for="qtext">Question Text</label>
-              <textarea id="qtext" name="qtext" required><?php echo htmlspecialchars($old['qtext']); ?></textarea>
+              <textarea id="qtext" name="qtext" required><?php echo htmlspecialchars($row['question']); ?></textarea>
             </div>
 
             <div class="q-row">
@@ -229,19 +172,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="q-choices">
               <div class="q-row">
                 <label for="c1">Choice A</label>
-                <input id="c1" name="c1" type="text" required value="<?php echo htmlspecialchars($old['c1']); ?>"/>
+                <input id="c1" name="c1" type="text" required value="<?php echo htmlspecialchars($row['answerA']); ?>"/>
               </div>
               <div class="q-row">
                 <label for="c2">Choice B</label>
-                <input id="c2" name="c2" type="text" required value="<?php echo htmlspecialchars($old['c2']); ?>"/>
+                <input id="c2" name="c2" type="text" required value="<?php echo htmlspecialchars($row['answerB']); ?>"/>
               </div>
               <div class="q-row">
                 <label for="c3">Choice C</label>
-                <input id="c3" name="c3" type="text" required value="<?php echo htmlspecialchars($old['c3']); ?>"/>
+                <input id="c3" name="c3" type="text" required value="<?php echo htmlspecialchars($row['answerC']); ?>"/>
               </div>
               <div class="q-row">
                 <label for="c4">Choice D</label>
-                <input id="c4" name="c4" type="text" required value="<?php echo htmlspecialchars($old['c4']); ?>"/>
+                <input id="c4" name="c4" type="text" required value="<?php echo htmlspecialchars($row['answerD']); ?>"/>
               </div>
             </div>
 
@@ -249,10 +192,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <label for="correct">Correct Answer</label>
               <select id="correct" name="correct" required>
                 <option value="">— Choose correct option —</option>
-                <option value="A" <?php echo $old['correct']==='A'?'selected':''; ?>>A</option>
-                <option value="B" <?php echo $old['correct']==='B'?'selected':''; ?>>B</option>
-                <option value="C" <?php echo $old['correct']==='C'?'selected':''; ?>>C</option>
-                <option value="D" <?php echo $old['correct']==='D'?'selected':''; ?>>D</option>
+                <option value="A" <?php echo $row['correctAnswer']==='A'?'selected':''; ?>>A</option>
+                <option value="B" <?php echo $row['correctAnswer']==='B'?'selected':''; ?>>B</option>
+                <option value="C" <?php echo $row['correctAnswer']==='C'?'selected':''; ?>>C</option>
+                <option value="D" <?php echo $row['correctAnswer']==='D'?'selected':''; ?>>D</option>
               </select>
             </div>
           </fieldset>
