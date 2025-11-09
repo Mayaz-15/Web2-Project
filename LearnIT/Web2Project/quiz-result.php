@@ -10,7 +10,7 @@ session_start();
 
 // --- Session check---
 if (!isset($_SESSION['id']) || !isset($_SESSION['userType']) || $_SESSION['userType'] !== 'learner') {
-    header("Location: login.php");
+    header("Location: index.php");
     exit();
 }
 $learnerID = (int) $_SESSION['id'];
