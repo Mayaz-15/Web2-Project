@@ -54,7 +54,7 @@ $photoFile = "default_profile.png";
 
 if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
     $uniqueName = time() . "_" . $_FILES['photo']['name'];
-    $uploadDir = "uploads/";
+    $uploadDir = "images/";
 
     if (!is_dir($uploadDir)) { mkdir($uploadDir, 0775, true); }
 
