@@ -2,12 +2,12 @@
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-if (!isset($_SESSION['user_id'], $_SESSION['user_type'])) {
-    header('Location: index.php?error=notLoggedIn');
+if (!isset($_SESSION['id'], $_SESSION['userType'])) {
+    header('Location: index.php');
     exit();
 }
-if (strtolower(trim((string)$_SESSION['user_type'])) !== 'learner') {
-    header('Location: index.php?error=wrongRole');
+if ($_SESSION['userType']!== 'learner') {
+    header('Location: login.php');
     exit();
 }
 
