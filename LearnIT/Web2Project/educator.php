@@ -1,18 +1,38 @@
 <?php
-// ===== Educator Home (dashboard only; part D handled in educator_review.php) =====
+
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php'); exit;
+}
+
+if ($_SESSION['user_type'] !== 'educator') {
+    $_SESSION = [];
+    if (ini_get('session.use_cookies')) {
+        $p = session_get_cookie_params();
+        setcookie(session_name(), '', time()-42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
+    }
+    session_destroy();
+    header('Location: login.php?error=not_educator');
+    exit;
+}
+
+
+
+// ===== Educator Home (Single file with inline 6(d) handler) =====
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-session_start();
+
 require_once __DIR__ . '/connect.php';  // defines $conn (PDO or MySQLi)
 
 // --- Auth ---
-if (empty($_SESSION['id']) || empty($_SESSION['userType'])) {
-  header('Location: index.php'); exit;
+if (empty($_SESSION['user_id']) || empty($_SESSION['user_type'])) {
+  header('Location: index.php?error=login_required'); exit;
 }
-if ($_SESSION['userType'] !== 'educator') {
-  header('Location: login.php'); exit;
+if ($_SESSION['user_type'] !== 'educator') {
+  header('Location: login.php?error=not_educator'); exit;
 }
 $userId = (int)$_SESSION['user_id'];
 
@@ -51,6 +71,81 @@ function fetch_all($conn, $sql, $params = []) {
     return $rows;
   }
   return [];
+}
+
+// ---------- 6(d) INLINE POST HANDLER ----------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rec_id'])) {
+  $recId    = (int)($_POST['rec_id'] ?? 0);
+  $decision = strtolower(trim($_POST['decision'] ?? ''));
+  $comment  = trim($_POST['comment'] ?? '');
+
+  if ($recId > 0 && in_array($decision, ['approved','disapproved'], true)) {
+
+    // 1) Load the recommendation + ensure it belongs to this educator
+    if ($conn instanceof PDO) {
+      $stmt = $conn->prepare(
+        "SELECT rq.*, q.educatorID
+         FROM RecommendedQuestion rq
+         JOIN Quiz q ON q.id = rq.quizID
+         WHERE rq.id = ? LIMIT 1"
+      );
+      $stmt->execute([$recId]);
+      $rec = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    } else {
+      mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+      $stmt = $conn->prepare(
+        "SELECT rq.*, q.educatorID
+         FROM RecommendedQuestion rq
+         JOIN Quiz q ON q.id = rq.quizID
+         WHERE rq.id = ? LIMIT 1"
+      );
+      $stmt->bind_param('i', $recId);
+      $stmt->execute();
+      $rec = $stmt->get_result()->fetch_assoc();
+    }
+
+    if ($rec && (int)$rec['educatorID'] === $userId) {
+      // 2) Update status + comments
+      if ($conn instanceof PDO) {
+        $u = $conn->prepare("UPDATE RecommendedQuestion SET status=?, comments=? WHERE id=?");
+        $u->execute([$decision, $comment, $recId]);
+      } else {
+        $u = $conn->prepare("UPDATE RecommendedQuestion SET status=?, comments=? WHERE id=?");
+        $u->bind_param('ssi', $decision, $comment, $recId);
+        $u->execute();
+      }
+
+      // 3) If approved, add to QuizQuestion
+      if ($decision === 'approved') {
+        $quizID  = (int)$rec['quizID'];
+        $qText   = $rec['question'];
+        $qFigure = $rec['questionFigureFileName']; // nullable
+        $aA = $rec['answerA']; $aB = $rec['answerB']; $aC = $rec['answerC']; $aD = $rec['answerD'];
+        $correct = strtoupper(trim($rec['correctAnswer']));
+
+        if ($conn instanceof PDO) {
+          $ins = $conn->prepare(
+            "INSERT INTO QuizQuestion
+             (quizID, question, questionFigureFileName, answerA, answerB, answerC, answerD, correctAnswer)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+          );
+          $ins->execute([$quizID, $qText, $qFigure, $aA, $aB, $aC, $aD, $correct]);
+        } else {
+          $ins = $conn->prepare(
+            "INSERT INTO QuizQuestion
+             (quizID, question, questionFigureFileName, answerA, answerB, answerC, answerD, correctAnswer)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+          );
+          $ins->bind_param('isssssss', $quizID, $qText, $qFigure, $aA, $aB, $aC, $aD, $correct);
+          $ins->execute();
+        }
+      }
+    }
+  }
+
+  // PRG pattern
+  header('Location: educator.php?msg=review_saved');
+  exit;
 }
 
 // ---------- Profile ----------
@@ -100,7 +195,7 @@ $quizzes = fetch_all(
   [$userId]
 );
 
-// ---------- 6(d): Pending Recommended Questions (display only) ----------
+// ---------- 6(d): Pending Recommended Questions ----------
 $recs = fetch_all(
   $conn,
   "SELECT 
@@ -259,7 +354,7 @@ $recs = fetch_all(
 
         <br><br><br>
 
-        <!-- ===== 6(d): Pending Recommended Questions (review UI only) ===== -->
+        <!-- ===== 6(d): Pending Recommended Questions (with inline review) ===== -->
         <table class="recQS-F">
           <h3>Questions Recommendations</h3>
           <colgroup>
@@ -293,8 +388,9 @@ $recs = fetch_all(
             $ansD    = htmlspecialchars($r['answerD'] ?? '', ENT_QUOTES,'UTF-8');
             $correct = strtoupper(trim($r['correct'] ?? ''));
 
-            $qImg = $r['q_img'] ?? '';
-            $imgPath = $qImg ? 'images/'.trim((string)$qImg) : '';
+           $qImg = $r['q_img'] ?? '';
+$imgPath = $qImg ? 'images/'.trim((string)$qImg) : '';
+
             $imgHtml = $imgPath ? '<div class="question-photo"><img src="'.htmlspecialchars($imgPath,ENT_QUOTES,'UTF-8').'" alt="figure" style="max-width:11.25rem;max-height:7.5rem;border-radius:.375rem;"></div>' : '';
           ?>
             <tr>
@@ -316,9 +412,7 @@ $recs = fetch_all(
                 </ol>
               </td>
               <td class="CommentCell">
-                
-                  
-                <form action="educator_review.php" method="post" class="review-form">
+                <form action="educator.php" method="post" class="review-form">
                   <input type="hidden" name="rec_id" value="<?= $recId ?>">
                   <div class="comment_txtarea">
                     <label for="c<?= $recId ?>">Comment:</label>
