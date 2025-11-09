@@ -1,6 +1,17 @@
-<?php 
-require_once 'connect.php'; 
+<?php
+require_once 'connect.php';
+
+$error = $_GET['error'] ?? '';
+$type  = $_GET['type']  ?? 'learner';   // keep which tab the user was on
+
+$errMap = [
+  'missing_fields' => 'Please fill in all required fields.',
+  'invalid_email'  => 'Please enter a valid email address.',
+  'email_exists'   => 'This email is already registered. Try logging in.',
+];
+$errText = $errMap[$error] ?? '';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -111,25 +122,54 @@ require_once 'connect.php';
       margin-top: auto;
       width: 100%;
     }
+    
+    .alert-error{
+  margin:1rem 0; padding:.9rem 1rem;
+  border:1px solid #f5c2c7; background:#f8d7da; color:#842029;
+  border-radius:6px;
+}
+
+    
+    
+    
+    
   </style>
 
 <script>
-  function toggleForms() {
-    let learnerBox = document.getElementById("learnerBox");
-    let educatorBox = document.getElementById("educatorBox");
-    let userTypeHidden = document.getElementById("userTypeHidden");
+  function setGroupState(boxId, enable, requiredNames=[]) {
+    const box = document.getElementById(boxId);
+    box.style.display = enable ? "block" : "none";
 
-    if (document.getElementById("learnerRadio").checked) {
-      learnerBox.style.display = "block";
-      educatorBox.style.display = "none";
-      userTypeHidden.value = "learner"; 
-    } else {
-      learnerBox.style.display = "none";
-      educatorBox.style.display = "block";
-      userTypeHidden.value = "educator"; 
-    }
+    // Toggle disabled & required on all controls in that box
+    box.querySelectorAll("input, select, textarea").forEach(el => {
+      el.disabled = !enable;
+      // Only mark required for the names you want required in that group
+      if (enable && requiredNames.includes(el.name)) {
+        el.setAttribute("required", "required");
+      } else {
+        el.removeAttribute("required");
+      }
+    });
   }
+
+  function toggleForms() {
+    const userTypeHidden = document.getElementById("userTypeHidden");
+    const isLearner = document.getElementById("learnerRadio").checked;
+
+    userTypeHidden.value = isLearner ? "learner" : "educator";
+
+    // List which fields should be required in each group
+    const learnerRequired = ["firstName", "lastName", "email", "password"];
+    const educatorRequired = ["firstNameEdu", "lastNameEdu", "emailEdu", "passwordEdu"];
+
+    setGroupState("learnerBox",  isLearner, learnerRequired);
+    setGroupState("educatorBox", !isLearner, educatorRequired);
+  }
+
+  // Ensure correct state on load (in case Educator is preselected)
+  document.addEventListener("DOMContentLoaded", toggleForms);
 </script>
+
 
 </head>
 <body>
@@ -149,18 +189,28 @@ require_once 'connect.php';
 <main class="card-container">
 
   <h2>Create Your Account</h2>
+  <?php if ($errText): ?>
+  <div class="alert-error"><?= htmlspecialchars($errText, ENT_QUOTES, 'UTF-8'); ?></div>
+<?php endif; ?>
+
 
   <fieldset>
     <legend>User Type:</legend>
-    <label><input type="radio" name="ut" id="learnerRadio" value="learner" checked onclick="toggleForms()"> Learner</label>
-    <label><input type="radio" name="ut" id="educatorRadio" value="educator" onclick="toggleForms()"> Educator</label>
-  </fieldset>
+<label>
+  <input type="radio" name="ut" id="learnerRadio" value="learner"
+         <?= $type==='learner' ? 'checked' : '' ?> onclick="toggleForms()"> Learner
+</label>
+
+<label>
+  <input type="radio" name="ut" id="educatorRadio" value="educator"
+         <?= $type==='educator' ? 'checked' : '' ?> onclick="toggleForms()"> Educator
+</label>  </fieldset>
 
   <form action="signup_process.php" method="POST" enctype="multipart/form-data">
 
     <!-- ✅ hidden input مهم جداً -->
-    <input type="hidden" id="userTypeHidden" name="userType" value="learner">
-
+<input type="hidden" id="userTypeHidden" name="userType"
+       value="<?= $type==='educator' ? 'educator' : 'learner' ?>">
     <!-- Learner -->
     <div id="learnerBox">
       <fieldset>
@@ -184,24 +234,24 @@ require_once 'connect.php';
     </div>
 
     <!-- Educator -->
-    <div id="educatorBox" class="hidden">
+    <div id="educatorBox" class="hidden" aria-hidden="true">
       <fieldset>
         <legend>Educator Form</legend>
 
         <label>First Name:</label>
-        <input type="text" name="firstNameEdu">
+        <input type="text" name="firstNameEdu" required="">
 
         <label>Last Name:</label>
-        <input type="text" name="lastNameEdu">
+        <input type="text" name="lastNameEdu" required="">
 
         <label>Profile Image (optional):</label>
         <input type="file" name="photo" accept="image/*">
 
         <label>Email:</label>
-        <input type="email" name="emailEdu">
+        <input type="email" name="emailEdu" required="">
 
         <label>Password:</label>
-        <input type="password" name="passwordEdu">
+        <input type="password" name="passwordEdu" required="">
 
         <label>Specialized Topics:</label>
         <?php
