@@ -101,7 +101,14 @@ INSERT INTO `quizquestion` (`id`, `quizID`, `question`, `questionFigureFileName`
 (10, 4, 'Which of the following best describes the purpose of the network shown in the diagram?\r\n', 'q4-1762631336.png', 'It provides a VPN connection', 'It separates traffic types to improve security.', 'It performs data encryption.', 'It monitors physical devices.', 'B'),
 (11, 4, 'Which of the following best describes phishing?\r\n', NULL, 'A type of malware that encrypts files', 'A brute-force attack on passwords', ' A network scanning tool', 'A social engineering attack that tricks users into revealing sensitive information', 'D'),
 (12, 4, 'Which security measure is used primarily to block unauthorized network traffic?\r\n', NULL, 'Firewall', 'Backup', 'Anti-virus', 'Keylogger', 'A'),
-(13, 4, 'Based on the cybersecurity domains in the diagram, which pair of areas focuses primarily on protecting data both in use and in recovery?\r\n\r\n', 'q4-1762631517.png', 'Application Security and End-User Security. ', 'End-User Security and Network Security.', 'Network Security and Operational Security. ', 'Information Security and Disaster Recovery Planning. ', 'D');
+(13, 4, 'Based on the cybersecurity domains in the diagram, which pair of areas focuses primarily on protecting data both in use and in recovery?\r\n\r\n', 'q4-1762631517.png', 'Application Security and End-User Security. ', 'End-User Security and Network Security.', 'Network Security and Operational Security. ', 'Information Security and Disaster Recovery Planning. ', 'D'), 
+(14, 1, 'Which metric is commonly used to evaluate classification models?', NULL, 'Mean Squared Error', 'Accuracy', 'Euclidean Distance', 'Support', 'B'),
+(15, 1, 'Which of the following is an example of unsupervised learning?', NULL, 'Regression', 'Classification', 'Clustering', 'Neural Networks', 'C'),
+(16, 1, 'What is the main goal of regression algorithms?', NULL, 'Classify data', 'Predict continuous values', 'Group similar items', 'Find frequent patterns', 'B'),
+(17, 1, 'What happens when learning rate is too high?', NULL, 'Training converges slowly', 'Model never converges', 'Model generalizes better', 'Overfitting decreases', 'B'),
+(18, 1, 'Which of the following is a feature selection technique?', NULL, 'Backward elimination', 'Cross validation', 'Gradient descent', 'Data augmentation', 'A'),
+(19, 1, 'Which activation function is commonly used in hidden layers of neural networks?', NULL, 'ReLU', 'Sigmoid', 'Softmax', 'Linear', 'A'),
+(20, 1, 'What is the main purpose of cross-validation?', NULL, 'Increase dataset size', 'Tune hyperparameters', 'Estimate model performance', 'Reduce dimensionality', 'C');
 
 -- --------------------------------------------------------
 
