@@ -1,16 +1,29 @@
 <?php
 // --- DB + session ---
-$conn = mysqli_connect("localhost", "root", "root", "dblearnit");
-if (!$conn) { die("Connection failed: " . mysqli_connect_error()); }
-mysqli_set_charset($conn, "utf8mb4");
+require_once 'connect.php';
 
 session_start();
-// dev stub (remove when real login exists)
-if (!isset($_SESSION['id'])) {
-  $_SESSION['id'] = 1;           // educator
-  $_SESSION['userType'] = 'educator';
+
+
+// 🔁 Map login.php session keys to the ones this page expects
+if (isset($_SESSION['user_id']) && !isset($_SESSION['id'])) {
+    $_SESSION['id'] = $_SESSION['user_id'];
+}
+if (isset($_SESSION['user_type']) && !isset($_SESSION['userType'])) {
+    $_SESSION['userType'] = $_SESSION['user_type'];
 }
 
+// Check if user is logged in
+if (!isset($_SESSION['id']) || !isset($_SESSION['userType'])) {
+    header("Location: index.php?error=unauthorized");
+    exit;
+}
+
+// Check if the user is an educator
+if ($_SESSION['userType'] !== 'educator') {
+    header("Location: index.php?error=unauthorized");
+    exit;
+}
 // --- inputs ---
 // Support BOTH ?quizID= and ?quiz_id= so it works with educator.php
 $quizID = 0;
@@ -140,7 +153,7 @@ $qres = mysqli_query($conn, "
       <h1>LearnIT</h1>
     </div>
     <nav>
-      <a href="educator.html">Home</a>
+      <a href="educator.php">Home</a>
     </nav>
   </header>
 
@@ -168,8 +181,9 @@ $qres = mysqli_query($conn, "
                 <div class="q-actions">
                   <a class="btn" href="edit-question.php?id=<?php echo (int)$row['id']; ?>">Edit</a>
                   <a class="btn delete"
-                     href="quiz.php?quizID=<?php echo (int)$quizID; ?>&delete=<?php echo (int)$row['id']; ?>"
-                     onclick="return confirm('Delete this question?');">Delete</a>
+   href="delete-question.php?quizID=<?php echo $quizID; ?>&id=<?php echo $row['id']; ?>"
+   onclick="return confirm('Delete this question?');">Delete</a>
+
                 </div>
               </div>
 
