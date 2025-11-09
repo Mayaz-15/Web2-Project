@@ -1,22 +1,33 @@
 <?php
 // --- DB + session (matches your local creds) ---
-$conn = mysqli_connect("localhost", "root", "root", "dblearnit");
-if (!$conn) { die("Connection failed: " . mysqli_connect_error()); }
-mysqli_set_charset($conn, "utf8mb4");
+require_once 'connect.php';
 
 session_start();
-// Dev stub (remove when real login exists)
-if (!isset($_SESSION['id'])) {
-  $_SESSION['id'] = 1;
-  $_SESSION['userType'] = 'educator';
+
+// 🔁 Map login.php session keys to the ones this page expects
+if (isset($_SESSION['user_id']) && !isset($_SESSION['id'])) {
+    $_SESSION['id'] = $_SESSION['user_id'];
+}
+if (isset($_SESSION['user_type']) && !isset($_SESSION['userType'])) {
+    $_SESSION['userType'] = $_SESSION['user_type'];
 }
 
-// quizID from GET or POST
+// ✅ Check if user is logged in
+if (!isset($_SESSION['id']) || !isset($_SESSION['userType'])) {
+    header("Location: index.php?error=unauthorized");
+    exit;
+}
+
+// ✅ Check if the user is an educator
+if ($_SESSION['userType'] !== 'educator') {
+    header("Location: index.php?error=unauthorized");
+    exit;
+}
+
+// quizID from GET
 $quizID = 0;
 if (isset($_GET['quizID'])) {
     $quizID = (int)$_GET['quizID'];
-} elseif (isset($_POST['quizID'])) {
-    $quizID = (int)$_POST['quizID'];
 }
 
 if ($quizID <= 0) {
@@ -32,68 +43,6 @@ $tres = mysqli_query($conn,
     WHERE q.id = {$quizID} LIMIT 1");
 if ($tres && mysqli_num_rows($tres)) {
   $topicName = mysqli_fetch_assoc($tres)['topicName'];
-}
-
-// sticky form + errors
-$old = [
-  'qtext' => $_POST['qtext'] ?? '',
-  'c1'    => $_POST['c1'] ?? '',
-  'c2'    => $_POST['c2'] ?? '',
-  'c3'    => $_POST['c3'] ?? '',
-  'c4'    => $_POST['c4'] ?? '',
-  'correct' => $_POST['correct'] ?? '',
-];
-$errors = [];
-
-// handle POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  if (trim($old['qtext']) === '') $errors[] = "Question text is required.";
-  if (trim($old['c1'])   === '') $errors[] = "Choice A is required.";
-  if (trim($old['c2'])   === '') $errors[] = "Choice B is required.";
-  if (trim($old['c3'])   === '') $errors[] = "Choice C is required.";
-  if (trim($old['c4'])   === '') $errors[] = "Choice D is required.";
-  if (!in_array($old['correct'], ['A','B','C','D'], true)) $errors[] = "Choose the correct answer (A–D).";
-
-  // optional image
-  $figName = NULL;
-  if (!empty($_FILES['qfigure']['name'])) {
-    $allowed = ['png','jpg','jpeg','gif','webp'];
-    $ext = strtolower(pathinfo($_FILES['qfigure']['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, $allowed, true)) {
-      $errors[] = "Invalid image type. Allowed: " . implode(', ', $allowed);
-    }
-    if ($_FILES['qfigure']['error'] !== UPLOAD_ERR_OK) {
-      $errors[] = "Image upload error (code ".$_FILES['qfigure']['error'].").";
-    }
-    if ($_FILES['qfigure']['size'] > 3 * 1024 * 1024) {
-      $errors[] = "Image too large (max 3MB).";
-    }
-
-    if (!$errors) {
-      $uploadDir = __DIR__ . "/uploads";
-      if (!is_dir($uploadDir)) { @mkdir($uploadDir, 0775, true); }
-      $figName = "q{$quizID}-" . time() . "." . $ext;
-      $dest = $uploadDir . "/" . $figName;
-      if (!move_uploaded_file($_FILES['qfigure']['tmp_name'], $dest)) {
-        $errors[] = "Failed to move uploaded file.";
-      }
-    }
-  }
-
-  if (!$errors) {
-    $sql = "INSERT INTO quizquestion
-      (quizID, question, questionFigureFileName, answerA, answerB, answerC, answerD, correctAnswer)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param(
-      $stmt, "isssssss",
-      $quizID, $old['qtext'], $figName, $old['c1'], $old['c2'], $old['c3'], $old['c4'], $old['correct']
-    );
-    mysqli_stmt_execute($stmt);
-
-    header("Location: quiz.php?quizID=".$quizID);
-    exit;
-  }
 }
 ?>
 <!DOCTYPE html>
@@ -154,7 +103,7 @@ legend { font-weight:bold; padding:0 0.625em; }
       <h1>LEARNIT</h1>
     </div>
     <nav>
-      <a href="quiz.php?quizID=<?php echo (int)$quizID; ?>">Back to Quiz</a>
+      <a href="educator.php">Home</a>
     </nav>
   </header>
 
@@ -168,23 +117,20 @@ legend { font-weight:bold; padding:0 0.625em; }
           <a class="takeHome" href="quiz.php?quizID=<?php echo (int)$quizID; ?>">Back to Quiz</a>
         </div>
 
-        <?php if ($errors): ?>
+        <?php if (isset($_GET['error'])): ?>
           <div style="background:#ffecec;border:1px solid #ffb3b3;color:#b30000;padding:0.75rem;border-radius:0.5rem;margin-bottom:1rem;">
-            <strong>Please fix the following:</strong>
-            <ul style="margin-left:1.25rem;">
-              <?php foreach ($errors as $e): ?><li><?php echo htmlspecialchars($e); ?></li><?php endforeach; ?>
-            </ul>
+            <?php echo htmlspecialchars($_GET['error']); ?>
           </div>
         <?php endif; ?>
 
-        <!-- your original layout, now posting to self -->
-        <form class="flex-container" action="add-question.php?quizID=<?php echo (int)$quizID; ?>" method="post" enctype="multipart/form-data">
+        <!-- FORM: now sends to a separate PHP page -->
+        <form class="flex-container" action="add-question-process.php" method="post" enctype="multipart/form-data">
           <input type="hidden" name="quizID" value="<?php echo (int)$quizID; ?>"/>
 
           <fieldset>
             <legend>Question Details</legend>
 
-            <!-- Topic display (replaces static select to avoid mismatches) -->
+            <!-- Topic display (read-only) -->
             <div class="q-row">
               <label>Topic</label>
               <input type="text" value="<?php echo htmlspecialchars($topicName); ?>" readonly
@@ -193,7 +139,7 @@ legend { font-weight:bold; padding:0 0.625em; }
 
             <div class="q-row">
               <label for="qtext">Question Text</label>
-              <textarea id="qtext" name="qtext" required placeholder="Write the question..."><?php echo htmlspecialchars($old['qtext']); ?></textarea>
+              <textarea id="qtext" name="qtext" required placeholder="Write the question..."></textarea>
             </div>
 
             <div class="q-row">
@@ -206,19 +152,19 @@ legend { font-weight:bold; padding:0 0.625em; }
             <div class="q-choices">
               <div class="q-row">
                 <label for="c1">Choice A</label>
-                <input id="c1" name="c1" type="text" required value="<?php echo htmlspecialchars($old['c1']); ?>"/>
+                <input id="c1" name="c1" type="text" required />
               </div>
               <div class="q-row">
                 <label for="c2">Choice B</label>
-                <input id="c2" name="c2" type="text" required value="<?php echo htmlspecialchars($old['c2']); ?>"/>
+                <input id="c2" name="c2" type="text" required />
               </div>
               <div class="q-row">
                 <label for="c3">Choice C</label>
-                <input id="c3" name="c3" type="text" required value="<?php echo htmlspecialchars($old['c3']); ?>"/>
+                <input id="c3" name="c3" type="text" required />
               </div>
               <div class="q-row">
                 <label for="c4">Choice D</label>
-                <input id="c4" name="c4" type="text" required value="<?php echo htmlspecialchars($old['c4']); ?>"/>
+                <input id="c4" name="c4" type="text" required />
               </div>
             </div>
 
@@ -226,10 +172,10 @@ legend { font-weight:bold; padding:0 0.625em; }
               <label for="correct">Correct Answer</label>
               <select id="correct" name="correct" required>
                 <option value="">— Choose correct option —</option>
-                <option value="A" <?php echo $old['correct']==='A'?'selected':''; ?>>A</option>
-                <option value="B" <?php echo $old['correct']==='B'?'selected':''; ?>>B</option>
-                <option value="C" <?php echo $old['correct']==='C'?'selected':''; ?>>C</option>
-                <option value="D" <?php echo $old['correct']==='D'?'selected':''; ?>>D</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
               </select>
             </div>
           </fieldset>
