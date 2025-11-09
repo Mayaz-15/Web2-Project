@@ -1,13 +1,32 @@
 <?php
 
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php'); exit;
+}
+
+if ($_SESSION['user_type'] !== 'learner') {
+    
+    $_SESSION = [];
+    if (ini_get('session.use_cookies')) {
+        $p = session_get_cookie_params();
+        setcookie(session_name(), '', time()-42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
+    }
+    session_destroy();
+    header('Location: login.php?error=not_learner'); 
+    exit;
+}
+
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-if (!isset($_SESSION['id'], $_SESSION['userType'])) {
-    header('Location: index.php');
+if (!isset($_SESSION['user_id'], $_SESSION['user_type'])) {
+    header('Location: index.php?error=notLoggedIn');
     exit();
 }
-if ($_SESSION['userType']!== 'learner') {
-    header('Location: login.php');
+if (strtolower(trim((string)$_SESSION['user_type'])) !== 'learner') {
+    header('Location: index.php?error=wrongRole');
     exit();
 }
 
