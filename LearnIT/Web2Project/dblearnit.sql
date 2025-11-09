@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.2
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 07, 2025 at 09:00 PM
+-- Generation Time: Nov 08, 2025 at 07:53 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -40,7 +40,8 @@ CREATE TABLE `quiz` (
 INSERT INTO `quiz` (`id`, `educatorID`, `topicID`) VALUES
 (1, 1, 1),
 (2, 1, 2),
-(3, 1, 3);
+(3, 1, 3),
+(4, 4, 3);
 
 -- --------------------------------------------------------
 
@@ -96,7 +97,11 @@ INSERT INTO `quizquestion` (`id`, `quizID`, `question`, `questionFigureFileName`
 (6, 2, 'Edge computing helps by…', NULL, 'Increasing latency', 'Processing near source', 'Removing devices', 'Encrypting passwords', 'B'),
 (7, 3, 'Which is a form of social engineering?', NULL, 'Phishing', 'Firewall', 'VPN', 'IDS', 'A'),
 (8, 3, 'Which encryption is symmetric?', NULL, 'RSA', 'AES', 'ECC', 'Diffie-Hellman', 'B'),
-(9, 3, 'CIA triad stands for…', NULL, 'Confidentiality, Integrity, Availability', 'Control, Inspect, Audit', 'Code, Input, Access', 'Cloud, Identity, Auth', 'A');
+(9, 3, 'CIA triad stands for…', NULL, 'Confidentiality, Integrity, Availability', 'Control, Inspect, Audit', 'Code, Input, Access', 'Cloud, Identity, Auth', 'A'),
+(10, 4, 'Which of the following best describes the purpose of the network shown in the diagram?\r\n', 'q4-1762631336.png', 'It provides a VPN connection', 'It separates traffic types to improve security.', 'It performs data encryption.', 'It monitors physical devices.', 'B'),
+(11, 4, 'Which of the following best describes phishing?\r\n', NULL, 'A type of malware that encrypts files', 'A brute-force attack on passwords', ' A network scanning tool', 'A social engineering attack that tricks users into revealing sensitive information', 'D'),
+(12, 4, 'Which security measure is used primarily to block unauthorized network traffic?\r\n', NULL, 'Firewall', 'Backup', 'Anti-virus', 'Keylogger', 'A'),
+(13, 4, 'Based on the cybersecurity domains in the diagram, which pair of areas focuses primarily on protecting data both in use and in recovery?\r\n\r\n', 'q4-1762631517.png', 'Application Security and End-User Security. ', 'End-User Security and Network Security.', 'Network Security and Operational Security. ', 'Information Security and Disaster Recovery Planning. ', 'D');
 
 -- --------------------------------------------------------
 
@@ -145,9 +150,9 @@ CREATE TABLE `takenquiz` (
 --
 
 INSERT INTO `takenquiz` (`id`, `quizID`, `score`) VALUES
-(1, 1, '85.00'),
-(2, 2, '60.00'),
-(3, 3, '95.00');
+(1, 1, 85.00),
+(2, 2, 60.00),
+(3, 3, 95.00);
 
 -- --------------------------------------------------------
 
@@ -192,7 +197,8 @@ CREATE TABLE `user` (
 INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAddress`, `password`, `photoFileName`, `userType`) VALUES
 (1, 'Nora', 'AlQahtani', 'nora.educator@ksu.edu.sa', '$2y$10$0WK8EdOfjmzD.PN747p0iux7Pno8kFvGi6wR.cCXjX7EVpaLyTu0y', 'u1-nora.png', 'educator'),
 (2, 'Reem', 'AlOtaibi', 'reem.learner@ksu.edu.sa', '$2y$10$zBxH/b/rmgpKBVvqHw4t3Oj/j.HP1a4Hi0f6GC6x0m/dgcYdMuhuO', 'u2-reem.png', 'learner'),
-(3, 'Lama', 'AlHarbi', 'lama.learner@ksu.edu.sa', '$2y$10$HZ5QuEUgJ31eex/uuMr5A.ZuUvr99cbm6XYUWAAGaqIdcy6TbhXpu', 'u3-lama.png', 'learner');
+(3, 'Lama', 'AlHarbi', 'lama.learner@ksu.edu.sa', '$2y$10$HZ5QuEUgJ31eex/uuMr5A.ZuUvr99cbm6XYUWAAGaqIdcy6TbhXpu', 'u3-lama.png', 'learner'),
+(4, 'Razan', 'AlMutairi', 'razan.educator@ksu.edu.sa', '$2y$10$PQxqOYlDDoBw.jthA48kTO.VyQgEtgEQ/..FFlemOAa3xYQILc/Lm', 'default_profile.png', 'educator');
 
 --
 -- Indexes for dumped tables
@@ -256,7 +262,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `quiz`
 --
 ALTER TABLE `quiz`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `quizfeedback`
@@ -268,7 +274,7 @@ ALTER TABLE `quizfeedback`
 -- AUTO_INCREMENT for table `quizquestion`
 --
 ALTER TABLE `quizquestion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `recommendedquestion`
@@ -292,7 +298,7 @@ ALTER TABLE `topic`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
