@@ -2,10 +2,11 @@
 session_start();
 include 'connect.php'; // should define $conn
 
-if (!$conn) { die("Connection failed: " . mysqli_connect_error()); }
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 
-// --- Session check---
-// 🔁 Map login.php session keys to the ones this page expects
+// --- Session mapping (for consistency) ---
 if (isset($_SESSION['user_id']) && !isset($_SESSION['id'])) {
     $_SESSION['id'] = $_SESSION['user_id'];
 }
@@ -13,13 +14,11 @@ if (isset($_SESSION['user_type']) && !isset($_SESSION['userType'])) {
     $_SESSION['userType'] = $_SESSION['user_type'];
 }
 
-// ✅ Check if user is logged in
+// Check if user is logged in and is a learner
 if (!isset($_SESSION['id']) || !isset($_SESSION['userType'])) {
     header("Location: index.php?error=unauthorized");
     exit;
 }
-
-// ✅ Check if the user is an learner
 if ($_SESSION['userType'] !== 'learner') {
     header("Location: index.php?error=unauthorized");
     exit;
@@ -29,18 +28,13 @@ if ($_SESSION['userType'] !== 'learner') {
 $topics = [];
 $result = $conn->query("SELECT id, topicName FROM topic");
 while ($row = $result->fetch_assoc()) $topics[] = $row;
-
-// --- Fetch educators ---
-$educators = [];
-$result = $conn->query("SELECT id, CONCAT(firstName, ' ', lastName) AS fullName FROM user WHERE userType='educator'");
-while ($row = $result->fetch_assoc()) $educators[] = $row;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recommend-Question</title>
+  <title>Recommend a Question</title>
   <link rel="stylesheet" href="style.css">
   <style>
     h2 { text-align: center; font-size:2.5rem; }
@@ -60,7 +54,44 @@ while ($row = $result->fetch_assoc()) $educators[] = $row;
     textarea { min-height: 5.0em; resize: vertical; }
     #q { display:flex; align-items:center; gap: 0.75rem; flex-wrap: wrap; }
   </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+  $(document).ready(function() {
+      $('#topic').on('change', function() {
+          var topicID = $(this).val();
+          if (!topicID) {
+              $('#prof').html('<option value="">Select topic first</option>');
+              return;
+          }
+
+          $.ajax({
+              url: 'get-educators.php',
+              method: 'GET',
+              data: { topicID: topicID },
+              dataType: 'json',
+              success: function(response) {
+                  $('#prof').empty();
+                  if (response.length === 0) {
+                      $('#prof').append('<option value="">No educators found</option>');
+                  } else {
+                      $('#prof').append('<option value="" disabled selected>Select educator</option>');
+                      $.each(response, function(index, educator) {
+                          $('#prof').append(
+                              $('<option>', { value: educator.id, text: educator.name })
+                          );
+                      });
+                  }
+              },
+              error: function(xhr, status, error) {
+                  console.log("AJAX Error:", error);
+                  alert('Error retrieving educators.');
+              }
+          });
+      });
+  });
+  </script>
 </head>
+
 <body>
   <header>
     <div class="logo">
@@ -76,7 +107,6 @@ while ($row = $result->fetch_assoc()) $educators[] = $row;
     <div class="card-container">
       <h2>Recommend a Question</h2>
 
-     
       <form action="submit-recommendation.php" method="POST" enctype="multipart/form-data">
         <fieldset>
           <label>Select a Topic:</label>
@@ -89,10 +119,7 @@ while ($row = $result->fetch_assoc()) $educators[] = $row;
 
           <label>Choose a Professor:</label>
           <select id="prof" name="prof" required>
-            <option value="" disabled selected>Select educator</option>
-            <?php foreach ($educators as $e): ?>
-              <option value="<?= $e['id'] ?>"><?= htmlspecialchars($e['fullName']) ?></option>
-            <?php endforeach; ?>
+            <option value="">Select topic first</option>
           </select>
 
           <label>Write your Question here:</label>
