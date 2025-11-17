@@ -73,80 +73,6 @@ function fetch_all($conn, $sql, $params = []) {
   return [];
 }
 
-// ---------- 6(d) INLINE POST HANDLER ----------
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rec_id'])) {
-  $recId    = (int)($_POST['rec_id'] ?? 0);
-  $decision = strtolower(trim($_POST['decision'] ?? ''));
-  $comment  = trim($_POST['comment'] ?? '');
-
-  if ($recId > 0 && in_array($decision, ['approved','disapproved'], true)) {
-
-    // 1) Load the recommendation + ensure it belongs to this educator
-    if ($conn instanceof PDO) {
-      $stmt = $conn->prepare(
-        "SELECT rq.*, q.educatorID
-         FROM RecommendedQuestion rq
-         JOIN Quiz q ON q.id = rq.quizID
-         WHERE rq.id = ? LIMIT 1"
-      );
-      $stmt->execute([$recId]);
-      $rec = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
-    } else {
-      mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-      $stmt = $conn->prepare(
-        "SELECT rq.*, q.educatorID
-         FROM RecommendedQuestion rq
-         JOIN Quiz q ON q.id = rq.quizID
-         WHERE rq.id = ? LIMIT 1"
-      );
-      $stmt->bind_param('i', $recId);
-      $stmt->execute();
-      $rec = $stmt->get_result()->fetch_assoc();
-    }
-
-    if ($rec && (int)$rec['educatorID'] === $userId) {
-      // 2) Update status + comments
-      if ($conn instanceof PDO) {
-        $u = $conn->prepare("UPDATE RecommendedQuestion SET status=?, comments=? WHERE id=?");
-        $u->execute([$decision, $comment, $recId]);
-      } else {
-        $u = $conn->prepare("UPDATE RecommendedQuestion SET status=?, comments=? WHERE id=?");
-        $u->bind_param('ssi', $decision, $comment, $recId);
-        $u->execute();
-      }
-
-      // 3) If approved, add to QuizQuestion
-      if ($decision === 'approved') {
-        $quizID  = (int)$rec['quizID'];
-        $qText   = $rec['question'];
-        $qFigure = $rec['questionFigureFileName']; // nullable
-        $aA = $rec['answerA']; $aB = $rec['answerB']; $aC = $rec['answerC']; $aD = $rec['answerD'];
-        $correct = strtoupper(trim($rec['correctAnswer']));
-
-        if ($conn instanceof PDO) {
-          $ins = $conn->prepare(
-            "INSERT INTO QuizQuestion
-             (quizID, question, questionFigureFileName, answerA, answerB, answerC, answerD, correctAnswer)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-          );
-          $ins->execute([$quizID, $qText, $qFigure, $aA, $aB, $aC, $aD, $correct]);
-        } else {
-          $ins = $conn->prepare(
-            "INSERT INTO QuizQuestion
-             (quizID, question, questionFigureFileName, answerA, answerB, answerC, answerD, correctAnswer)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-          );
-          $ins->bind_param('isssssss', $quizID, $qText, $qFigure, $aA, $aB, $aC, $aD, $correct);
-          $ins->execute();
-        }
-      }
-    }
-  }
-
-  // PRG pattern
-  header('Location: educator.php?msg=review_saved');
-  exit;
-}
 
 // ---------- Profile ----------
 $row = fetch_one(
@@ -184,7 +110,7 @@ $quizzes = fetch_all(
   "SELECT 
       q.id AS quiz_id,
       t.topicName AS topic_name,
-      (SELECT COUNT(*) FROM QuizQuestion qq WHERE qq.quizID = q.id) AS questions_count,
+      (SELECT COUNT(*) FROM quizquestion qq WHERE qq.quizID = q.id) AS questions_count,
       (SELECT COUNT(*) FROM TakenQuiz tq WHERE tq.quizID = q.id)      AS takers_count,
       (SELECT AVG(tq.score) FROM TakenQuiz tq WHERE tq.quizID = q.id) AS avg_score,
       (SELECT COUNT(*) FROM QuizFeedback f WHERE f.quizID = q.id)     AS feedback_count,
@@ -210,7 +136,7 @@ $recs = fetch_all(
      u.firstName        AS learner_first,
      u.lastName         AS learner_last,
      COALESCE(u.photoFileName,'') AS learner_photo
-   FROM RecommendedQuestion rq
+   FROM recommendedquestion rq
    JOIN Quiz   q  ON q.id = rq.quizID
    JOIN Topic  t  ON t.id = q.topicID
    JOIN User   u  ON u.id = rq.learnerID
@@ -411,22 +337,30 @@ $imgPath = $qImg ? 'images/'.trim((string)$qImg) : '';
                   <li<?= $correct==='D'?' class="correct"':'' ?>><?= $ansD ?></li>
                 </ol>
               </td>
+            
               <td class="CommentCell">
-                <form action="educator.php" method="post" class="review-form">
-                  <input type="hidden" name="rec_id" value="<?= $recId ?>">
-                  <div class="comment_txtarea">
-                    <label for="c<?= $recId ?>">Comment:</label>
-                    <textarea id="c<?= $recId ?>" name="comment" rows="3" cols="22" placeholder="Optional note to learner"></textarea>
-                  </div>
-                  <br>
-                  <div class="ANSYorN">
-                    <label><input type="radio" name="decision" value="approved" checked> Approve</label>
-                    <label><input type="radio" name="decision" value="disapproved"> Disapprove</label>
-                  </div>
-                  <br>
-                  <button type="submit" class="btn submit-btn">Submit</button>
-                </form>
-              </td>
+  <!-- We’ll send this via JS, not a page reload -->
+  <form class="review-form" data-id="<?= $recId ?>">
+    <input type="hidden" class="rec-id" value="<?= $recId ?>">
+    <div class="comment_txtarea">
+      <label for="c<?= $recId ?>">Comment:</label>
+      <textarea id="c<?= $recId ?>" class="rq-comments" rows="3" cols="22"
+                placeholder="Optional note to learner"></textarea>
+    </div>
+    <br>
+    <div class="ANSYorN">
+      <label><input type="radio" name="decision" value="approve" checked> Approve</label>
+      <label><input type="radio" name="decision" value="disapprove"> Disapprove</label>
+    </div>
+    <br>
+    <button type="button" class="btn submit review-btn"
+            data-id="<?= $recId ?>">Submit</button>
+  </form>
+</td>
+
+              
+              
+              
             </tr>
           <?php endforeach; endif; ?>
           </tbody>
@@ -436,5 +370,48 @@ $imgPath = $qImg ? 'images/'.trim((string)$qImg) : '';
      <footer>
         <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
      </footer>
+      
+      
+      <script>
+document.addEventListener('click', async e => {
+  const btn = e.target.closest('.review-btn');
+  if (!btn) return;
+
+  const form = btn.closest('.review-form');
+  const id = form.querySelector('.rec-id').value;
+  const decision = form.querySelector('input[name="decision"]:checked')?.value;
+  const comments = form.querySelector('.rq-comments')?.value.trim() || '';
+
+  btn.disabled = true;
+
+  try {
+    const fd = new FormData();
+    fd.append('id', id);
+    fd.append('decision', decision);
+    fd.append('comments', comments);
+
+    const res = await fetch('educator_review.php', { method: 'POST', body: fd });
+    const data = await res.json();
+
+    if (data.ok) {
+      // Remove the whole row on success
+      const row = btn.closest('tr');
+      row.parentNode.removeChild(row);
+    } else {
+      alert('Failed: ' + (data.error || 'Unknown error'));
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Network error.');
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+
+
+  
+      
   </body>
 </html>
+
