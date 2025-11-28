@@ -171,44 +171,26 @@ $recRes = mysqli_stmt_get_result($stmt2);
   <!-- (c,d,e) Quizzes -->
   <div class="quiz-headerAvailableQizzes" style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem;">
     <h3>All Available Quizzes</h3>
-    <form method="post" action="learner.php" class="QuizheaderContainer2">
-      <select name="topicID" id="QTDropDownF">
-        <option value="">All topics</option>
-        <?php foreach ($topics as $t): ?>
-          <option value="<?= (int)$t['id'] ?>" <?= ($t['id'] == $selectedTopicId ? 'selected' : '') ?>>
-            <?= e($t['topicName']) ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
-      <button type="submit" class="filter">Filter</button>
-    </form>
+   
+ 
+<select name="topicID" id="topicDD">
+  <option value="">All topics</option>
+  <?php foreach ($topics as $t): ?>
+    <option value="<?= (int)$t['id'] ?>" <?= $t['id'] == $selectedTopicId ? 'selected' : '' ?>>
+      <?= e($t['topicName']) ?>
+    </option>
+  <?php endforeach; ?>
+</select>
+
   </div>
 
-  <table class="Available_Quizzes-F">
-    <thead>
-      <tr><th>Topic</th><th>Educator</th><th>Number of Questions</th><th></th></tr>
-    </thead>
-    <tbody>
-      <?php if ($quizzes && mysqli_num_rows($quizzes) > 0): ?>
-        <?php while ($q = mysqli_fetch_assoc($quizzes)): ?>
-          <?php
-            $topic  = e($q['topicName']);
-            $fname  = e($q['firstName']);
-            $lname  = e($q['lastName']);
-            $photoE = 'images/' . e($q['educatorPhoto']);
-            $count  = (int)$q['questionCount'];
-            $quizID = (int)$q['quizID'];
-          ?>
-          <tr>
-            <td><?= $topic ?></td>
-            <td><div class="learneredu2"><img src="<?= $photoE ?>" alt="Educator"><p><?= $fname ?></p></div></td>
-            <td><?= $count ?> QS</td>
-            <td><?= $count>0 ? "<a href='take-quiz.php?quizID=$quizID'>Take Quiz</a>" : "<span style='opacity:.6'>No questions</span>" ?></td>
-          </tr>
-        <?php endwhile; ?>
-      <?php else: ?><tr><td colspan="4">No quizzes found.</td></tr><?php endif; ?>
-    </tbody>
-  </table>
+  
+<table class="Available_Quizzes-F">
+  <thead>
+    <tr><th>Topic</th><th>Educator</th><th>Number of Questions</th><th></th></tr>
+  </thead>
+  <tbody id="quizzesBody"></tbody>
+</table>
 
   <!-- (f) Recommended Questions -->
   <div class="RECQS">
@@ -256,5 +238,86 @@ $recRes = mysqli_stmt_get_result($stmt2);
 <footer>
   <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
 </footer>
+    
+ <!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+(function(){
+  const select = document.getElementById('topicDD');
+  const tbody  = document.getElementById('quizzesBody');
+
+  async function loadQuizzes() {
+    
+    const fd = new FormData();
+    fd.append('topicID', select.value || '');
+
+    try {
+     const res = await fetch('learner_quizzes.php', {
+    method: 'POST',
+    body: fd,
+    headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+    },
+    credentials: 'same-origin' 
+});
+
+
+      if (!res.ok) {
+        tbody.innerHTML = `<tr><td colspan="4">Cannot load quizzes (code ${res.status}).</td></tr>`;
+        return;
+      }
+
+      const data = await res.json();
+      
+      if (!Array.isArray(data) || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4">No quizzes found.</td></tr>`;
+        return;
+      }
+
+    
+      tbody.innerHTML = data.map(r => {
+        const topic   = escapeHtml(r.topicName);
+        const fname   = escapeHtml(r.educatorFirst);
+        const lname   = escapeHtml(r.educatorLast);
+        const photo   = 'images/' + (r.educatorPhoto || 'default.png');
+        const count   = Number(r.questionCount) || 0;
+        const qid     = Number(r.quizID) || 0;
+
+        return `
+          <tr>
+            <td>${topic}</td>
+            <td>
+              <div class="learnreedu2">
+                <img src="${photo}" alt="Educator" />
+                <p>${fname} ${lname}</p>
+              </div>
+            </td>
+            <td>${count} Qs</td>
+            <td>${count > 0 ? `<a href="quiz.php?quizID=${qid}">Take Quiz</a>` : `<span style="opacity:.6">No questions</span>`}</td>
+          </tr>`;
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="4">Network error.</td></tr>`;
+      console.error(e);
+    }
+  }
+
+  function escapeHtml(s){
+    return String(s ?? '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#039;');
+  }
+
+  select.addEventListener('change', loadQuizzes);
+  document.addEventListener('DOMContentLoaded', loadQuizzes);
+})();
+</script>
+
+    
+    
 </body>
 </html>
