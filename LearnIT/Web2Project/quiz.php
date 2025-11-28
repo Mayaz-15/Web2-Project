@@ -43,23 +43,6 @@ if ($_SESSION['userType'] !== 'educator') {
 }
 
 
-// --- delete handler ---
-if (isset($_GET['delete'])) {
-  $qid = (int)$_GET['delete'];
-
-  // fetch old image to delete file if exists
-  $imgRes = mysqli_query($conn, "SELECT questionFigureFileName FROM quizquestion WHERE id=$qid AND quizID=$quizID");
-  if ($imgRes && mysqli_num_rows($imgRes)) {
-    $imgRow = mysqli_fetch_assoc($imgRes);
-    if (!empty($imgRow['questionFigureFileName'])) {
-      $path = __DIR__ . "/uploads/" . $imgRow['questionFigureFileName'];
-      if (is_file($path)) { @unlink($path); }
-    }
-  }
-  mysqli_query($conn, "DELETE FROM quizquestion WHERE id=$qid AND quizID=$quizID");
-  header("Location: quiz.php?quizID=".$quizID); exit;
-}
-
 // --- fetch topic name (for header) ---
 $topicName = "Quiz";
 $tres = mysqli_query($conn,
@@ -88,6 +71,7 @@ $qres = mysqli_query($conn, "
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quiz</title>
   <link rel="stylesheet" href="style.css"/>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
   <style>
   /* Same variable system as add-question.html */
@@ -171,6 +155,9 @@ $qres = mysqli_query($conn, "
     ← Back to Dashboard
   </a>
 </div>
+<div id="deleteComment" 
+     style="margin-bottom:1rem; display:none; padding:0.75rem; background:#e8ffe8; border:1px solid #8fd98f; border-radius:6px; color:#256029;">
+</div>
 
         <!-- Q -->
         <?php if ($qres && mysqli_num_rows($qres)): ?>
@@ -180,9 +167,12 @@ $qres = mysqli_query($conn, "
                 <div><strong>Q<?php echo $n++; ?>.</strong> <?php echo htmlspecialchars($row['question']); ?></div>
                 <div class="q-actions">
                   <a class="btn" href="edit-question.php?id=<?php echo (int)$row['id']; ?>">Edit</a>
-                  <a class="btn delete"
-   href="delete-question.php?quizID=<?php echo $quizID; ?>&id=<?php echo $row['id']; ?>"
-   onclick="return confirm('Delete this question?');">Delete</a>
+                 <a href="#"
+   class="btn delete"
+   data-qid="<?php echo (int)$row['id']; ?>">
+   Delete
+</a>
+
 
                 </div>
               </div>
@@ -213,5 +203,58 @@ $qres = mysqli_query($conn, "
   <footer>
     <p>&copy; 2025 LearnIT | Empowering Tech Learning</p>
   </footer>
+    <script>
+$(function () {
+  // Delegate click handler to the panel (works even if elements change later)
+  $('.q-panel').on('click', '.delete', function (e) {
+    e.preventDefault();
+
+    const $btn   = $(this);
+    const qid    = $btn.data('qid');              // question id
+    const quizID = <?php echo (int)$quizID; ?>;   // current quiz id from PHP
+
+    if (!confirm('Delete this question?')) {
+      return;
+    }
+
+    $.ajax({
+      url: 'delete-question.php',
+      method: 'POST',
+      data: {
+        quizID: quizID,
+        id: qid
+      },
+      dataType: 'text'
+    })
+    .done(function (response) {
+      // Our PHP echoes '1' on success
+if ($.trim(response) === '1') {
+
+    // 1) Remove the card from the quiz list
+    $btn.closest('.q-card').slideUp(200, function () {
+        $(this).remove();
+    });
+
+    // 2) Show success message in comment area
+    $('#deleteComment')
+        .text('Question deleted successfully.')
+        .fadeIn(300);
+
+    // 3) Auto-hide after 3 seconds for nicer UI
+    setTimeout(function() {
+        $('#deleteComment').fadeOut(300);
+    }, 3000);
+}
+ else {
+        alert('Failed to delete the question. Please try again.');
+      }
+    })
+    .fail(function () {
+      alert('Server error while deleting the question.');
+    });
+  });
+});
+</script>
+
 </body>
 </html>
