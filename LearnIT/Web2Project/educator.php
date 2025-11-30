@@ -78,7 +78,7 @@ function fetch_all($conn, $sql, $params = []) {
 $row = fetch_one(
   $conn,
   "SELECT firstName, lastName, emailAddress, COALESCE(photoFileName,'') AS photoFileName
-   FROM User WHERE id = ? LIMIT 1",
+   FROM user WHERE id = ? LIMIT 1",
   [$userId]
 );
 if (!$row) {
@@ -93,7 +93,7 @@ if (!$row) {
     [$userId]
   );
 }
-$firstName     = $row['firstName']     ?? 'User';
+$firstName     = $row['firstName']     ?? 'user';
 $lastName      = $row['lastName']      ?? '';
 $emailAddress  = $row['emailAddress']  ?? '';
 $photoFileName = $row['photoFileName'] ?? '';
@@ -139,7 +139,7 @@ $recs = fetch_all(
    FROM recommendedquestion rq
    JOIN Quiz   q  ON q.id = rq.quizID
    JOIN Topic  t  ON t.id = q.topicID
-   JOIN User   u  ON u.id = rq.learnerID
+   JOIN user   u  ON u.id = rq.learnerID
    WHERE q.educatorID = ? AND LOWER(rq.status) = 'pending'
    ORDER BY rq.id DESC",
   [$userId]
