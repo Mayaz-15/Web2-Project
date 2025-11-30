@@ -288,7 +288,7 @@ $recRes = mysqli_stmt_get_result($stmt2);
           <tr>
             <td>${topic}</td>
             <td>
-              <div class="learnreedu2">
+              <div class="learneredu2">
                 <img src="${photo}" alt="Educator" />
                 <p>${fname} ${lname}</p>
               </div>
